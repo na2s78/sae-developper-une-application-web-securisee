@@ -5,7 +5,7 @@
     - PASHO Kevin
     - FANARA Romain
     - HAMED OMER Adnan
-    - RODRIGEZ-NETO Gabriel
+    - RODRIGUES-NETO Gabriel
 
 ## Répartition des tâches
 
