@@ -1,0 +1,24 @@
+
+
+@font-face {
+    /* je suis obligé d'utiliser le nom officiel de la police */
+    font-family: '[z] Arista';
+    src: url('./polices_css/Arista.woff2') format('woff2');
+    font-family: '[z] Arista_Light';
+    src: url('./polices_css/Arista_Light.woff2') format('woff2');
+}
+
+body {
+    background-color: #c2c2c2;
+    font-family: '[z] Arista', sans-serif;
+    font-weight: bold;
+    font-synthesis: none;
+    line-height: 1.2;
+    letter-spacing: +0.1em;
+}
+
+h1 { line-height: 1.0; }
+
+img { width: 20%; }
+
+p, div { font-family: '[z] Arista_Light', sans-serif; letter-spacing: +0.05em; }
