@@ -36,3 +36,18 @@ create table touite (
   idimage int,
   constraint pk_touite primary key (idtouite),
   constraint ck_nbeval check (nbeval >= 0)
+)
+
+
+create table touitetag (
+  idtouite int not null,
+  idtag int not null,
+  constraint pk_touitetag primary key (idtouite, idtag)
+);
+
+
+create table suivre (
+  idsuiveur int not null,
+  idsuivi int not null,
+  constraint pk_suivre primary key (idsuiveur, idsuivi)
+);
