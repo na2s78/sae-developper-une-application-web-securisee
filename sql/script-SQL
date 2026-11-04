@@ -16,3 +16,23 @@ create table image (
   cheminimage varchar(255) not null,
   constraint pk_image primary key (idimage)
 );
+
+create table tag (
+  idtag int not null,
+  libelletag varchar(30) not null,
+  desctag varchar(100),
+  constraint pk_tag primary key (idtag),
+  constraint uq_libelle unique (libelletag),
+  constraint ck_libelle check (libelletag like '#%')
+);
+
+
+create table touite (
+  idtouite int not null,
+  textetouite varchar(235) not null,
+  datepub date default sysdate not null,
+  nbeval int default 0,
+  idutil int not null,
+  idimage int,
+  constraint pk_touite primary key (idtouite),
+  constraint ck_nbeval check (nbeval >= 0)
