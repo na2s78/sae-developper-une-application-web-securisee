@@ -1,0 +1,18 @@
+create table utilisateur (
+  idutil int not null,
+  nomutil varchar(30) not null,
+  prenomutil varchar(30) not null,
+  emailutil varchar(60) not null,
+  nbtouites int default 0,
+  constraint pk_utilisateur primary key (idutil),
+  constraint uq_email unique (emailutil),
+  constraint ck_nbtouites check (nbtouites >= 0)
+);
+
+
+create table image (
+  idimage int not null,
+  descimage varchar(100),
+  cheminimage varchar(255) not null,
+  constraint pk_image primary key (idimage)
+);

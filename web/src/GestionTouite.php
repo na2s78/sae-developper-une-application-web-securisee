@@ -74,6 +74,13 @@ class GestionTouite
 
     // Fonctionnalité 8 : Enregistrer les tags d'un touite
 
+    private function extraireTags(string $texte): array
+{
+    preg_match_all('/#([\p{L}\p{N}_]+)/u', $texte, $matches);
+
+    return array_unique($matches[1]);
+}
+
 
     public function enregistrerTags(int $idTouite, string $texte): void
     {
