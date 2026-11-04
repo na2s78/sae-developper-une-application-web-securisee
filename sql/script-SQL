@@ -30,9 +30,40 @@ create table tag (
 create table touite (
   idtouite int not null,
   textetouite varchar(235) not null,
-  datepub date default sysdate not null,
+  datepub datetime default current_timestamp not null,
   nbeval int default 0,
   idutil int not null,
   idimage int,
   constraint pk_touite primary key (idtouite),
   constraint ck_nbeval check (nbeval >= 0)
+);
+
+
+create table touitetag (
+  idtouite int not null,
+  idtag int not null,
+  constraint pk_touitetag primary key (idtouite, idtag)
+);
+
+
+create table suivre (
+  idsuiveur int not null,
+  idsuivi int not null,
+  constraint pk_suivre primary key (idsuiveur, idsuivi)
+);
+
+create table abonnementtag (
+  idutil int not null,
+  idtag int not null,
+  constraint pk_abonnement primary key (idutil, idtag)
+);
+
+
+alter table touite add constraint fk_touite_util foreign key (idutil) references utilisateur (idutil);
+alter table touite add constraint fk_touite_image foreign key (idimage) references image (idimage);
+alter table touitetag add constraint fk_tt_touite foreign key (idtouite) references touite (idtouite);
+alter table touitetag add constraint fk_tt_tag foreign key (idtag) references tag (idtag);
+alter table suivre add constraint fk_suivre_suiveur foreign key (idsuiveur) references utilisateur (idutil);
+alter table suivre add constraint fk_suivre_suivi foreign key (idsuivi) references utilisateur (idutil);
+alter table abonnementtag add constraint fk_abo_util foreign key (idutil) references utilisateur (idutil);
+alter table abonnementtag add constraint fk_abo_tag foreign key (idtag) references tag (idtag);
