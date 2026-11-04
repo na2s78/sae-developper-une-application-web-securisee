@@ -1,5 +1,8 @@
-
 <?php
+
+namespace touiteur;
+
+use PDO;
 
 class GestionTouite
 {
@@ -7,10 +10,12 @@ class GestionTouite
 
     public function __construct(PDO $pdo)
     {
-        $this->pdo = $pdo;
+        $this->pdo =$pdo;
     }
 
-    // Fonctionnalité 1 : récupérer tous les touites
+    /**
+     * Fonctionnalité 1 : Récupérer tous les touites (ordre chronologique inverse)
+     */
     public function getTousLesTouites(): array
     {
         $sql = "
@@ -33,8 +38,9 @@ class GestionTouite
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-
-    // Fonctionnalité 2 : récupérer un touite précis
+    /**
+     * Fonctionnalité 2 : Récupérer un touite précis en détail (avec son image éventuelle)
+     */
     public function getTouiteParId(int $idTouite): ?array
     {
         $sql = "
@@ -57,164 +63,53 @@ class GestionTouite
             WHERE t.idTouite = :idTouite
         ";
 
-        $stmt = $this->pdo->prepare($sql);
-
-        $stmt->execute([
+        $stmt =$this->pdo->prepare($sql);$stmt->execute([
             ':idTouite' => $idTouite
         ]);
 
-        $touite = $stmt->fetch(PDO::FETCH_ASSOC);
+        $touite =$stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($touite === false) {
-            return null;
-        }
-
-        return $touite;
+        return $touite !== false ? $touite : null;
     }
 
-    // Fonctionnalité 8 : Enregistrer les tags d'un touite
-
+    /**
+     * Extraire les hashtags d'un texte
+     */
     private function extraireTags(string $texte): array
-{
-    preg_match_all('/#([\p{L}\p{N}_]+)/u', $texte, $matches);
+    {
+        preg_match_all('/#([\p{L}\p{N}_]+)/u', $texte,$matches);
 
-    return array_unique($matches[1]);
-}
+        return array_unique($matches[1]);
+    }
 
-
-    public function enregistrerTags(int $idTouite, string $texte): void
+    /**
+     * Fonctionnalité 8 : Extraire et enregistrer les tags d'un touite
+     */
+    public function enregistrerTags(int $idTouite, string$texte): void
     {
         $tags = $this->extraireTags($texte);
 
-        foreach ($tags as $tag) {
-
-            // On vérifie si le tag existe deja.
+        foreach ($tags as$tag) {
+            // 1. Vérifier si le tag existe déjà
             $sql = "SELECT idTag
                     FROM Tag
                     WHERE LOWER(libelleTag) = LOWER(:libelleTag)";
 
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([
-                'libelleTag' => $tag
+            $stmt =$this->pdo->prepare($sql);$stmt->execute([
+                ':libelleTag' => $tag
             ]);
 
-            $idTag = $stmt->fetchColumn();
+            $idTag =$stmt->fetchColumn();
 
-            // Si le tag n'existe pas, on le crée.
-            if ($idTag === false) {
+            // 2. Si le tag n'existe pas, on le crée et récupère son ID via PDO
+            if ($idTag === false) {$sqlInsert = "INSERT INTO Tag (libelleTag, descTag)
+                              VALUES (:libelleTag, NULL)";
 
-                $sql = "INSERT INTO Tag (libelleTag, descTag)
-                        VALUES (:libelleTag, NULL)";
-
-                $stmt = $this->pdo->prepare($sql);
-                $stmt->execute([
-                    'libelleTag' => $tag
+                $stmtInsert =$this->pdo->prepare($sqlInsert);$stmtInsert->execute([
+                    ':libelleTag' => $tag
                 ]);
 
-                // On récupère l'identifiant du tag qui vient d'être crée.
-                $sql = "SELECT idTag
-                        FROM Tag
-                        WHERE LOWER(libelleTag) = LOWER(:libelleTag)";
-
-                $stmt = $this->pdo->prepare($sql);
-                $stmt->execute([
-                    'libelleTag' => $tag
-                ]);
-
-                $idTag = $stmt->fetchColumn();
+                $idTag = (int)$this->pdo->lastInsertId();
+            } else {
+                $idTag = (int)$idTag;
             }
-
-            // On vérifie si l'association existe déjà.
-            $sql = "SELECT COUNT(*)
-                    FROM TouiteTag
-                    WHERE idTouite = :idTouite
-                    AND idTag = :idTag";
-
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([
-                'idTouite' => $idTouite,
-                'idTag' => $idTag
-            ]);
-
-            $associationExiste = $stmt->fetchColumn();
-
-            // Si l'association n'existe pas, on la crée.
-            if ($associationExiste == 0) {
-
-                $sql = "INSERT INTO TouiteTag (idTouite, idTag)
-                        VALUES (:idTouite, :idTag)";
-
-                $stmt = $this->pdo->prepare($sql);
-                $stmt->execute([
-                    'idTouite' => $idTouite,
-                    'idTag' => $idTag
-                ]);
-            }
-        }
-    }
-
-
-
-    // Fonctionnalité 4 : récupérer les touites d'un utilisateur
-    public function getTouitesParUtilisateur(int $idUtil): array
-    {
-        $sql = "
-            SELECT
-                t.idTouite,
-                t.texteTouite,
-                t.datePub,
-                t.nbEval,
-                u.idUtil,
-                u.nomUtil,
-                u.prenomUtil
-            FROM Touite t
-            JOIN Utilisateur u
-                ON t.idUtil = u.idUtil
-            WHERE u.idUtil = :idUtil
-            ORDER BY t.datePub DESC
-        ";
-
-        $stmt = $this->pdo->prepare($sql);
-
-        $stmt->execute([
-            ':idUtil' => $idUtil
-        ]);
-
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-
-    // Fonctionnalité 5 : récupérer les touites associés à un tag
-    public function getTouitesParTag(int $idTag): array
-    {
-        $sql = "
-            SELECT
-                t.idTouite,
-                t.texteTouite,
-                t.datePub,
-                t.nbEval,
-                u.idUtil,
-                u.nomUtil,
-                u.prenomUtil,
-                tg.idTag,
-                tg.libelleTag
-            FROM Touite t
-            JOIN Utilisateur u
-                ON t.idUtil = u.idUtil
-            JOIN TouiteTag tt
-                ON t.idTouite = tt.idTouite
-            JOIN Tag tg
-                ON tt.idTag = tg.idTag
-            WHERE tg.idTag = :idTag
-            ORDER BY t.datePub DESC
-        ";
-
-        $stmt = $this->pdo->prepare($sql);
-
-        $stmt->execute([
-            ':idTag' => $idTag
-        ]);
-
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-}
