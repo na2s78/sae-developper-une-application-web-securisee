@@ -3,9 +3,9 @@
 @font-face {
     /* je suis obligé d'utiliser le nom officiel de la police */
     font-family: '[z] Arista';
-    src: url('./polices_css/Arista.woff2') format('woff2');
+    src: url('polices_css/Arista.woff2') format('woff2');
     font-family: '[z] Arista_Light';
-    src: url('./polices_css/Arista_Light.woff2') format('woff2');
+    src: url('polices_css/Arista_Light.woff2') format('woff2');
 }
 
 body {
