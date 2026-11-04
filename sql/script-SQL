@@ -30,13 +30,13 @@ create table tag (
 create table touite (
   idtouite int not null,
   textetouite varchar(235) not null,
-  datepub date default sysdate not null,
+  datepub datetime default current_timestamp not null,
   nbeval int default 0,
   idutil int not null,
   idimage int,
   constraint pk_touite primary key (idtouite),
   constraint ck_nbeval check (nbeval >= 0)
-)
+);
 
 
 create table touitetag (
