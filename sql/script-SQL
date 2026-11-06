@@ -1,5 +1,5 @@
 create table utilisateur (
-  idutil int not null,
+  idutil int not null auto_increment,
   nomutil varchar(30) not null,
   prenomutil varchar(30) not null,
   emailutil varchar(60) not null,
@@ -7,63 +7,57 @@ create table utilisateur (
   constraint pk_utilisateur primary key (idutil),
   constraint uq_email unique (emailutil),
   constraint ck_nbtouites check (nbtouites >= 0)
-);
-
+) engine=innodb;
 
 create table image (
-  idimage int not null,
+  idimage int not null auto_increment,
   descimage varchar(100),
   cheminimage varchar(255) not null,
   constraint pk_image primary key (idimage)
-);
+) engine=innodb;
 
 create table tag (
-  idtag int not null,
+  idtag int not null auto_increment,
   libelletag varchar(30) not null,
   desctag varchar(100),
   constraint pk_tag primary key (idtag),
   constraint uq_libelle unique (libelletag),
   constraint ck_libelle check (libelletag like '#%')
-);
-
+) engine=innodb;
 
 create table touite (
-  idtouite int not null,
+  idtouite int not null auto_increment,
   textetouite varchar(235) not null,
   datepub datetime default current_timestamp not null,
   nbeval int default 0,
   idutil int not null,
   idimage int,
   constraint pk_touite primary key (idtouite),
-  constraint ck_nbeval check (nbeval >= 0)
-);
-
+  constraint ck_nbeval check (nbeval >= 0),
+  constraint fk_touite_util foreign key (idutil) references utilisateur (idutil) on delete cascade,
+  constraint fk_touite_image foreign key (idimage) references image (idimage) on delete set null
+) engine=innodb;
 
 create table touitetag (
   idtouite int not null,
   idtag int not null,
-  constraint pk_touitetag primary key (idtouite, idtag)
-);
-
+  constraint pk_touitetag primary key (idtouite, idtag),
+  constraint fk_tt_touite foreign key (idtouite) references touite (idtouite) on delete cascade,
+  constraint fk_tt_tag foreign key (idtag) references tag (idtag) on delete cascade
+) engine=innodb;
 
 create table suivre (
   idsuiveur int not null,
   idsuivi int not null,
-  constraint pk_suivre primary key (idsuiveur, idsuivi)
-);
+  constraint pk_suivre primary key (idsuiveur, idsuivi),
+  constraint fk_suivre_suiveur foreign key (idsuiveur) references utilisateur (idutil) on delete cascade,
+  constraint fk_suivre_suivi foreign key (idsuivi) references utilisateur (idutil) on delete cascade
+) engine=innodb;
 
 create table abonnementtag (
   idutil int not null,
   idtag int not null,
-  constraint pk_abonnement primary key (idutil, idtag)
-);
-
-
-alter table touite add constraint fk_touite_util foreign key (idutil) references utilisateur (idutil);
-alter table touite add constraint fk_touite_image foreign key (idimage) references image (idimage);
-alter table touitetag add constraint fk_tt_touite foreign key (idtouite) references touite (idtouite);
-alter table touitetag add constraint fk_tt_tag foreign key (idtag) references tag (idtag);
-alter table suivre add constraint fk_suivre_suiveur foreign key (idsuiveur) references utilisateur (idutil);
-alter table suivre add constraint fk_suivre_suivi foreign key (idsuivi) references utilisateur (idutil);
-alter table abonnementtag add constraint fk_abo_util foreign key (idutil) references utilisateur (idutil);
-alter table abonnementtag add constraint fk_abo_tag foreign key (idtag) references tag (idtag);
+  constraint pk_abonnement primary key (idutil, idtag),
+  constraint fk_abo_util foreign key (idutil) references utilisateur (idutil) on delete cascade,
+  constraint fk_abo_tag foreign key (idtag) references tag (idtag) on delete cascade
+) engine=innodb;

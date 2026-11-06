@@ -1,0 +1,69 @@
+delimiter $$
+
+drop trigger if exists trg_maj_nb_touites$$
+create trigger trg_maj_nb_touites
+after insert on touite
+for each row
+begin
+  update utilisateur
+  set nbtouites = nbtouites + 1
+  where idutil = new.idutil;
+end$$
+
+drop trigger if exists trg_verif_suivi$$
+create trigger trg_verif_suivi
+before insert on suivre
+for each row
+begin
+  declare v_email_suiveur varchar(60);
+  declare v_email_suivi varchar(60);
+
+  if new.idsuiveur = new.idsuivi then
+    signal sqlstate '45000'
+    set message_text = 'erreur : auto-suivi impossible';
+  end if;
+
+  select emailutil into v_email_suiveur
+  from utilisateur
+  where idutil = new.idsuiveur;
+
+  select emailutil into v_email_suivi
+  from utilisateur
+  where idutil = new.idsuivi;
+
+  if v_email_suiveur = v_email_suivi then
+    signal sqlstate '45000'
+    set message_text = 'erreur : meme adresse email';
+  end if;
+end$$
+
+drop trigger if exists trg_verif_auteur_touite$$
+create trigger trg_verif_auteur_touite
+before update on touite
+for each row
+begin
+  if new.idutil <> old.idutil then
+    signal sqlstate '45000'
+    set message_text = 'erreur : modification auteur interdite';
+  end if;
+end$$
+
+drop trigger if exists trg_limite_touites_jour$$
+create trigger trg_limite_touites_jour
+before insert on touite
+for each row
+begin
+  declare v_nb_touites_jour int;
+
+  select count(*) into v_nb_touites_jour
+  from touite
+  where idutil = new.idutil
+    and date(datepub) = current_date();
+
+  if v_nb_touites_jour >= 50 then
+    signal sqlstate '45000'
+    set message_text = 'erreur : limite de 50 touites par jour atteinte';
+  end if;
+end$$
+
+delimiter ;
