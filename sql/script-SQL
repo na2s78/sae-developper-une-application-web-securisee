@@ -3,7 +3,7 @@ create table utilisateur (
   nomutil varchar(30) not null,
   prenomutil varchar(30) not null,
   emailutil varchar(60) not null,
-  nbtouites int default 0,
+  nbtouites int default 0 not null,
   constraint pk_utilisateur primary key (idutil),
   constraint uq_email unique (emailutil),
   constraint ck_nbtouites check (nbtouites >= 0)

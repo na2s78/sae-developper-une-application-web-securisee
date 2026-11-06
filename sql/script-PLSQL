@@ -58,7 +58,7 @@ begin
   select count(*) into v_nb_touites_jour
   from touite
   where idutil = new.idutil
-    and date(datepub) = current_date();
+    and date(datepub) = date(new.datepub);
 
   if v_nb_touites_jour >= 50 then
     signal sqlstate '45000'
