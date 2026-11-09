@@ -1,27 +1,23 @@
 <?php
-
 declare(strict_types=1);
 
-require_once __DIR__ . '/src/GestionTouite.php';
-require_once __DIR__ . '/src/actions/Action.php';
-require_once __DIR__ . '/src/actions/HomeAction.php';
-require_once __DIR__ . '/src/actions/DetailAction.php';
-require_once __DIR__ . '/src/Dispatcher.php';
+require_once __DIR__ . '/src/autoloader.php';
 
+use touiteur\Connexion;
 use touiteur\Dispatcher;
+use touiteur\actions\HomeAction;
+
+session_start();
 
 try {
-    $pdo = new PDO(
-        'mysql:host=localhost;dbname=touiteur;charset=utf8mb4',
-        'root',
-        ''
-    );
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    Connexion::setConfig(__DIR__ . '/conf/db.ini');
+    $pdo = Connexion::makeConnection();
 } catch (Exception $e) {
-    die('Erreur de connexion BDD : ' . $e->getMessage());
+    die('Erreur de connexion à la base de données.');
 }
 
-$action = $_GET['action'] ?? 'home';
+$d = new Dispatcher($pdo);
+$d->addRoute('default', HomeAction::class)
+  ->addRoute('home', HomeAction::class);
 
-$dispatcher = new Dispatcher($pdo);
-echo $dispatcher->dispatch($action);
+$d->run();
