@@ -19,4 +19,7 @@
         - Structure autoloader connexion PDO dispatcher
         - Liste des touites et page de detail
         - Formulaire pour poster tags et upload d images
-        - Connexion des utilisateurs et mise en ligne sur webetu    
+        - Connexion des utilisateurs et mise en ligne sur webetu
+
+    - Nassim :
+        - Création du html global et ajout du CSS
