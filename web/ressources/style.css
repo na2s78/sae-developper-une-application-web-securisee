@@ -1,24 +1,346 @@
-
-
+/* polices */
 @font-face {
-    /* je suis obligé d'utiliser le nom officiel de la police */
     font-family: '[z] Arista';
     src: url('polices_css/Arista.woff2') format('woff2');
-    font-family: '[z] Arista_Light';
-    src: url('polices_css/Arista_Light.woff2') format('woff2');
+}
+
+/* variables */
+:root {
+    --bleu: #1ea1f2;
+    --bleu-fonce: #1580c4;
+    --bleu-clair: #e8f5fe;
+    --fond: #f2f4f7;
+    --blanc: #ffffff;
+    --texte: #1c2a36;
+    --gris: #6b7a87;
+    --bordure: #dde3e8;
+    --rouge: #e0245e;
+    --vert: #17bf63;
+}
+
+* {
+    box-sizing: border-box;
 }
 
 body {
-    background-color: #c2c2c2;
-    font-family: '[z] Arista', sans-serif;
-    font-weight: bold;
-    font-synthesis: none;
-    line-height: 1.2;
-    letter-spacing: +0.1em;
+    margin: 0;
+    background-color: var(--fond);
+    color: var(--texte);
+    font-family: Arial, sans-serif;
+    line-height: 1.4;
 }
 
-h1 { line-height: 1.0; }
+h1, h2, h3, .auteur, .bouton, .menu a {
+    font-family: '[z] Arista', sans-serif;
+    font-weight: bold;
+    letter-spacing: 0.05em;
+}
 
-img { width: 20%; }
+a {
+    color: inherit;
+    text-decoration: none;
+}
 
-p, div { font-family: '[z] Arista_Light', sans-serif; letter-spacing: +0.05em; }
+input, textarea, button {
+    font-family: inherit;
+    font-size: 1rem;
+}
+
+input[type="text"], input[type="email"], input[type="password"], input[type="search"], textarea {
+    padding: 8px 12px;
+    border: 1px solid var(--bordure);
+    border-radius: 20px;
+    outline: none;
+}
+
+input:focus, textarea:focus {
+    border-color: var(--bleu);
+}
+
+/* boutons */
+.bouton {
+    background-color: var(--bleu);
+    color: var(--blanc);
+    border: none;
+    border-radius: 20px;
+    padding: 8px 18px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.bouton:hover {
+    background-color: var(--bleu-fonce);
+}
+
+.bouton-contour {
+    background-color: var(--blanc);
+    color: var(--bleu);
+    border: 2px solid var(--bleu);
+}
+
+.bouton-contour:hover {
+    background-color: var(--bleu-clair);
+}
+
+/* entete */
+.entete {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 10px 30px;
+    background-color: var(--blanc);
+    border-bottom: 1px solid var(--bordure);
+}
+
+.logo img {
+    height: 45px;
+}
+
+.recherche input {
+    width: 300px;
+    background-color: var(--fond);
+}
+
+.connexion {
+    display: flex;
+    gap: 8px;
+}
+
+.connexion input {
+    width: 150px;
+}
+
+/* grid principale */
+.conteneur {
+    display: grid;
+    grid-template-columns: 200px 1fr 260px;
+    gap: 25px;
+    max-width: 1100px;
+    margin: 25px auto;
+    padding: 0 15px;
+}
+
+/* menu gauche */
+.menu {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.menu a {
+    padding: 12px 18px;
+    border-radius: 25px;
+    font-size: 1.1rem;
+    transition: background-color 0.2s;
+}
+
+.menu a:hover {
+    background-color: var(--bleu-clair);
+}
+
+.menu a.actif {
+    color: var(--bleu);
+}
+
+/* blocs */
+.carte {
+    background-color: var(--blanc);
+    border: 1px solid var(--bordure);
+    border-radius: 12px;
+    padding: 15px 20px;
+    margin-bottom: 15px;
+}
+
+.titre-section {
+    margin: 25px 0 15px;
+    font-size: 1.3rem;
+}
+
+/* formulaire touite */
+.publier textarea {
+    width: 100%;
+    height: 90px;
+    border-radius: 10px;
+    resize: none;
+}
+
+.publier-bas {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.bouton-image {
+    color: var(--bleu);
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.bouton-image input {
+    display: none;
+}
+
+/* carte touite */
+.touite {
+    transition: box-shadow 0.2s;
+}
+
+.touite:hover {
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+.touite-haut {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.auteur:hover {
+    color: var(--bleu);
+    text-decoration: underline;
+}
+
+.date {
+    color: var(--gris);
+    font-size: 0.85rem;
+}
+
+.touite-texte {
+    display: block;
+    margin: 0 0 12px;
+    word-wrap: break-word;
+}
+
+.tag {
+    color: var(--bleu);
+}
+
+.tag:hover {
+    text-decoration: underline;
+}
+
+.touite-bas {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--gris);
+    font-size: 0.9rem;
+}
+
+.lien-detail {
+    color: var(--bleu);
+}
+
+/* vue un seul touite */
+.detail {
+    border-left: 4px solid var(--bleu);
+}
+
+.detail .touite-texte {
+    font-size: 1.15rem;
+}
+
+.touite-image {
+    display: block;
+    max-width: 100%;
+    max-height: 350px;
+    margin: 0 auto 12px;
+    border-radius: 10px;
+}
+
+/* likes */
+.evaluer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.like, .dislike {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--bordure);
+    background-color: var(--blanc);
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.like:hover {
+    color: var(--vert);
+    border-color: var(--vert);
+}
+
+.dislike:hover {
+    color: var(--rouge);
+    border-color: var(--rouge);
+}
+
+/* pages */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.pagination a {
+    color: var(--bleu);
+    padding: 6px 14px;
+    border: 1px solid var(--bleu);
+    border-radius: 20px;
+}
+
+.pagination a:hover {
+    background-color: var(--bleu);
+    color: var(--blanc);
+}
+
+/* colonne droite */
+.cote h3 {
+    margin-top: 0;
+    font-size: 1.1rem;
+}
+
+.abonner {
+    display: flex;
+    gap: 8px;
+}
+
+.abonner input {
+    flex: 1;
+    min-width: 0;
+}
+
+.liste-tags {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.liste-tags li {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--bordure);
+}
+
+.liste-tags li:last-child {
+    border-bottom: none;
+}
+
+.liste-tags span {
+    color: var(--gris);
+}
+
+.pied {
+    text-align: center;
+    color: var(--gris);
+    font-size: 0.85rem;
+    padding: 20px;
+}

@@ -7,27 +7,140 @@
 </head>
 <body>
 
-<div >
-    <img src="images_css/touiteur_g.svg">
+<!-- header -->
+<header class="entete">
+    <a href="?action=home" class="logo">
+        <img src="images_css/touiteur_g.svg" alt="Touiteur">
+    </a>
 
-    <input name="recherche" type="search" placeholder="Rechercher sur Touiteur...">
-
-    <form method="POST" action="login">
-        <label for="user">Pseudo : </label>
-        <input type="email" id="mail" name="mail">
-        <label for="pw">Mot de passe : </label>
-        <input type="password" id="pw" name="pw">
-        <input type="submit" value="Connexion">
+    <form class="recherche" method="GET" action="index.php">
+        <input type="hidden" name="action" value="tag">
+        <input name="tag" type="search" placeholder="Rechercher un #tag...">
     </form>
+
+    <form class="connexion" method="POST" action="?action=connexion">
+        <input type="email" name="mail" placeholder="Email" required>
+        <input type="password" name="pw" placeholder="Mot de passe" required>
+        <button type="submit" class="bouton">Connexion</button>
+    </form>
+</header>
+
+<!-- conteneur principal -->
+<div class="conteneur">
+
+    <!-- menu gauche -->
+    <nav class="menu">
+        <a href="?action=home" class="actif">Accueil</a>
+        <a href="?action=mur">Mon mur</a>
+        <a href="?action=formulaire">Publier</a>
+        <a href="?action=profil">Mon profil</a>
+    </nav>
+
+    <!-- centre -->
+    <main class="fil">
+
+        <!-- pub -->
+        <form class="carte publier" method="POST" action="?action=formulaire" enctype="multipart/form-data">
+            <textarea name="texteTouite" maxlength="235" placeholder="Quoi de neuf ? Ajoutez des #tags..." required></textarea>
+            <div class="publier-bas">
+                <label class="bouton-image">
+                    Ajouter une image
+                    <input type="file" name="image" accept="image/*">
+                </label>
+                <button type="submit" class="bouton">Touiter</button>
+            </div>
+        </form>
+
+        <h2 class="titre-section">Derniers touites</h2>
+
+        <!-- les touites -->
+        <article class="carte touite">
+            <div class="touite-haut">
+                <a href="?action=user&id=1" class="auteur">Nassim Aliouane</a>
+                <span class="date">09/11/2026 14:32</span>
+            </div>
+            <a href="?action=detail&id=1" class="touite-texte">
+                Grosse session d'entraînement ce soir, on prépare le match de ce week-end ! <span class="tag">#foot</span> <span class="tag">#nancy</span>
+            </a>
+            <div class="touite-bas">
+                <span class="score">Score : 15</span>
+                <a href="?action=detail&id=1" class="lien-detail">Voir le touite</a>
+            </div>
+        </article>
+
+        <article class="carte touite">
+            <div class="touite-haut">
+                <a href="?action=user&id=2" class="auteur">Kevin Pasho</a>
+                <span class="date">09/11/2026 11:05</span>
+            </div>
+            <a href="?action=detail&id=2" class="touite-texte">
+                Qui est chaud pour un futsal demain aprèm après les cours ? <span class="tag">#futsal</span>
+            </a>
+            <div class="touite-bas">
+                <span class="score">Score : 4</span>
+                <a href="?action=detail&id=2" class="lien-detail">Voir le touite</a>
+            </div>
+        </article>
+
+        <!-- vue detail -->
+        <article class="carte touite detail">
+            <div class="touite-haut">
+                <a href="?action=user&id=1" class="auteur">Nassim Aliouane</a>
+                <span class="date">08/11/2026 18:47</span>
+            </div>
+            <p class="touite-texte">
+                Belle victoire des U17 aujourd'hui, fier des petits ! Le travail paie toujours.
+                <a href="?action=tag&tag=u17" class="tag">#u17</a>
+                <a href="?action=tag&tag=coach" class="tag">#coach</a>
+            </p>
+            <img src="images_css/touiteur_full.svg" alt="Image du touite" class="touite-image">
+            <div class="touite-bas">
+                <form method="POST" action="?action=like" class="evaluer">
+                    <input type="hidden" name="idTouite" value="3">
+                    <button type="submit" name="valeur" value="1" class="like">+1</button>
+                    <span class="score">Score : 27</span>
+                    <button type="submit" name="valeur" value="-1" class="dislike">-1</button>
+                </form>
+                <form method="POST" action="?action=follow">
+                    <input type="hidden" name="type" value="user">
+                    <input type="hidden" name="idUtilSuivi" value="1">
+                    <button type="submit" class="bouton bouton-contour">Suivre</button>
+                </form>
+            </div>
+        </article>
+
+        <!-- pages -->
+        <div class="pagination">
+            <a href="?action=home&page=1"><- Précédent</a>
+            <span>Page 2</span>
+            <a href="?action=home&page=3">Suivant -></a>
+        </div>
+    </main>
+
+    <!-- bloc droite -->
+    <aside class="cote">
+        <div class="carte">
+            <h3>S'abonner à un tag</h3>
+            <form method="POST" action="?action=follow" class="abonner">
+                <input type="hidden" name="type" value="tag">
+                <input type="text" name="libelleTag" placeholder="#tag">
+                <button type="submit" class="bouton">OK</button>
+            </form>
+        </div>
+
+        <div class="carte">
+            <h3>Tags populaires</h3>
+            <ul class="liste-tags">
+                <li><a href="?action=tag&tag=foot" class="tag">#foot</a> <span>42</span></li>
+                <li><a href="?action=tag&tag=php" class="tag">#php</a> <span>31</span></li>
+                <li><a href="?action=tag&tag=futsal" class="tag">#futsal</a> <span>18</span></li>
+            </ul>
+        </div>
+    </aside>
+
 </div>
 
-<div>Choix</div>
-<div>Feed</div>
-
-<article>
-<h1>Titre touite</h1>
-<p>exemple touite</p>
-</article>
+<footer class="pied">Touiteur.app &copy; 2026 - SAE BUT Informatique</footer>
 
 </body>
 </html>
