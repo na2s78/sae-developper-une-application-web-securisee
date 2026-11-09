@@ -16,7 +16,7 @@
         - Donnees de test et rapport   
 
     - Romain Adnan et Gabriel Partie PHP
-        - Structure autoloader connexion PDO dispatcher
+    
         - Liste des touites et page de detail
         - Formulaire pour poster tags et upload d images
         - Connexion des utilisateurs et mise en ligne sur webetu
@@ -25,3 +25,5 @@
         - Création du html global (maquette) et ajout du CSS
         - Classe Connexion
         - Dossier conf avec db.ini.exemple et la protection avec .htaccess
+        - Ajout de l'autoloader
+        - Mise en page
