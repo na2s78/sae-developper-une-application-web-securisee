@@ -22,4 +22,6 @@
         - Connexion des utilisateurs et mise en ligne sur webetu
 
     - Nassim :
-        - Création du html global et ajout du CSS
+        - Création du html global (maquette) et ajout du CSS
+        - Classe Connexion
+        - Dossier conf avec db.ini.exemple et la protection avec .htaccess
