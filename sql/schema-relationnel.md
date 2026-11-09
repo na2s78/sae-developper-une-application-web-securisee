@@ -1,4 +1,4 @@
-Utilisateur ("idUtil", nomUtil, prenomUtil, emailUtil, nbTouites)
+Utilisateur ("idUtil", nomUtil, prenomUtil, emailUtil, mdpUtil, roleUtil, nbTouites)
 Image ("idImage", descImage, cheminImage)
 Tag ("idTag", libelleTag, descTag)
 Touite ("idTouite", texteTouite, datePub, nbEval, #idUtil, #idImage)

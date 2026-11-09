@@ -1,8 +1,19 @@
+drop table if exists abonnementtag;
+drop table if exists suivre;
+drop table if exists touitetag;
+drop table if exists touite;
+drop table if exists tag;
+drop table if exists image;
+drop table if exists utilisateur;
+
+
 create table utilisateur (
   idutil int not null auto_increment,
   nomutil varchar(30) not null,
   prenomutil varchar(30) not null,
   emailutil varchar(60) not null,
+  mdputil varchar(255) not null,
+  roleutil int default 1 not null,
   nbtouites int default 0 not null,
   constraint pk_utilisateur primary key (idutil),
   constraint uq_email unique (emailutil),
@@ -21,8 +32,7 @@ create table tag (
   libelletag varchar(30) not null,
   desctag varchar(100),
   constraint pk_tag primary key (idtag),
-  constraint uq_libelle unique (libelletag),
-  constraint ck_libelle check (libelletag like '#%')
+  constraint uq_libelle unique (libelletag)
 ) engine=innodb;
 
 create table touite (

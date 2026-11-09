@@ -4,6 +4,8 @@
 | nomUtil     | Nom de l'utilisateur      | VARCHAR(30)  |
 | prenomUtil  | Prénom de l'utilisateur   | VARCHAR(30)  |
 | emailUtil   | Adresse e-mail            | VARCHAR(60)  |
+| mdpUtil     | Mot de passe haché de util| VARCHAR(255) |
+| roleUtil    | Role de l'utilisateur     | int          |
 | nbTouites   | Nombre de touites créés   | int          |
 | idTouite    | Numéro d'un touite        | int          |
 | texteTouite | Texte du touite           | VARCHAR(235) |
