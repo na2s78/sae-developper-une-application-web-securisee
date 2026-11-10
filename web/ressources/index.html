@@ -19,7 +19,7 @@
     </form>
 
     <form class="connexion" method="POST" action="?action=connexion">
-        <input type="email" name="mail" placeholder="Email" required>
+        <input type="text" name="mail" placeholder="Utilisateur" required>
         <input type="password" name="pw" placeholder="Mot de passe" required>
         <button type="submit" class="bouton">Connexion</button>
     </form>
@@ -53,34 +53,6 @@
 
         <h2 class="titre-section">Derniers touites</h2>
 
-        <!-- les touites -->
-        <article class="carte touite">
-            <div class="touite-haut">
-                <a href="?action=user&id=1" class="auteur">Nassim Aliouane</a>
-                <span class="date">09/11/2026 14:32</span>
-            </div>
-            <a href="?action=detail&id=1" class="touite-texte">
-                Grosse session d'entraînement ce soir, on prépare le match de ce week-end ! <span class="tag">#foot</span> <span class="tag">#nancy</span>
-            </a>
-            <div class="touite-bas">
-                <span class="score">Score : 15</span>
-                <a href="?action=detail&id=1" class="lien-detail">Voir le touite</a>
-            </div>
-        </article>
-
-        <article class="carte touite">
-            <div class="touite-haut">
-                <a href="?action=user&id=2" class="auteur">Kevin Pasho</a>
-                <span class="date">09/11/2026 11:05</span>
-            </div>
-            <a href="?action=detail&id=2" class="touite-texte">
-                Qui est chaud pour un futsal demain aprèm après les cours ? <span class="tag">#futsal</span>
-            </a>
-            <div class="touite-bas">
-                <span class="score">Score : 4</span>
-                <a href="?action=detail&id=2" class="lien-detail">Voir le touite</a>
-            </div>
-        </article>
 
         <!-- vue detail -->
         <article class="carte touite detail">
@@ -97,10 +69,9 @@
             <img src="images_css/touiteur_full.svg" alt="Image du touite" class="touite-image">
             <div class="touite-bas">
                 <form method="POST" action="?action=like" class="evaluer">
-                    <input type="hidden" name="idTouite" value="3">
-                    <button type="submit" name="valeur" value="1" class="like">+1</button>
-                    <span class="score">Score : 27</span>
-                    <button type="submit" name="valeur" value="-1" class="dislike">-1</button>
+                    <input type="hidden" name="idTouite" value="0">
+                    <button type="submit" name="valeur" value="1" class="like"><img src="images_css/like.svg" class="img_like"></button>
+                    <span class="score">27</span>
                 </form>
                 <form method="POST" action="?action=follow">
                     <input type="hidden" name="type" value="user">
@@ -113,7 +84,7 @@
         <!-- pages -->
         <div class="pagination">
             <a href="?action=home&page=1"><- Précédent</a>
-            <span>Page 2</span>
+            <span>Page x</span>
             <a href="?action=home&page=3">Suivant -></a>
         </div>
     </main>
@@ -141,7 +112,7 @@
 
 </div>
 
-<footer class="pied">Touiteur.app - SAE BUT2 Informatique - </footer>
+<footer class="pied">Touiteur.app - SAE BUT2 Informatique - NA,RF,KP,AHO,GRN</footer>
 
 </body>
 </html>

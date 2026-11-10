@@ -350,3 +350,8 @@ input:focus, textarea:focus {
     height: 7%;
     width: 7%;
 }
+
+.img_like {
+    height: 100%;
+    width: 100%;
+}
