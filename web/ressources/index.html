@@ -10,7 +10,7 @@
 <!-- header -->
 <header class="entete">
     <a href="?action=home" class="logo">
-        <img src="images_css/touiteur_g.svg" alt="Touiteur">
+        <img src="images_css/touiteur_txt.svg" alt="Touiteur">
     </a>
 
     <form class="recherche" method="GET" action="index.php">
@@ -45,7 +45,7 @@
             <div class="publier-bas">
                 <label class="bouton-image">
                     Ajouter une image
-                    <input type="file" name="image" accept="image/*">
+                    <input type="file" name="image" accept=".png,.jpeg,.gif,.jpg,.bmp,.webp">
                 </label>
                 <button type="submit" class="bouton">Touiter</button>
             </div>
@@ -85,6 +85,7 @@
         <!-- vue detail -->
         <article class="carte touite detail">
             <div class="touite-haut">
+                <img src="images_css/touiteur_logo.svg" alt="logo" class="logo_tt">
                 <a href="?action=user&id=1" class="auteur">Nassim Aliouane</a>
                 <span class="date">08/11/2026 18:47</span>
             </div>
@@ -140,7 +141,7 @@
 
 </div>
 
-<footer class="pied">Touiteur.app &copy; 2026 - SAE BUT Informatique</footer>
+<footer class="pied">Touiteur.app - SAE BUT2 Informatique - </footer>
 
 </body>
 </html>

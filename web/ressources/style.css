@@ -10,7 +10,7 @@
     --bleu-fonce: #1580c4;
     --bleu-clair: #e8f5fe;
     --fond: #f2f4f7;
-    --blanc: #ffffff;
+    --blanc: #c2c2c2;
     --texte: #1c2a36;
     --gris: #6b7a87;
     --bordure: #dde3e8;
@@ -33,7 +33,7 @@ body {
 h1, h2, h3, .auteur, .bouton, .menu a {
     font-family: '[z] Arista', sans-serif;
     font-weight: bold;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.1em;
 }
 
 a {
@@ -195,9 +195,10 @@ input:focus, textarea:focus {
 }
 
 .touite-haut {
-    display: flex;
+    display: inline-block;
     justify-content: space-between;
     margin-bottom: 8px;
+
 }
 
 .auteur:hover {
@@ -343,4 +344,9 @@ input:focus, textarea:focus {
     color: var(--gris);
     font-size: 0.85rem;
     padding: 20px;
+}
+
+.logo_tt {
+    height: 7%;
+    width: 7%;
 }
