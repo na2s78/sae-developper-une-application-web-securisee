@@ -33,7 +33,7 @@ body {
 h1, h2, h3, .auteur, .bouton, .menu a {
     font-family: '[z] Arista', sans-serif;
     font-weight: bold;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.07em;
 }
 
 a {
