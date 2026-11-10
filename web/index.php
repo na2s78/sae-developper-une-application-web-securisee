@@ -6,8 +6,11 @@ require_once __DIR__ . '/src/autoloader.php';
 use touiteur\Connexion;
 use touiteur\Dispatcher;
 use touiteur\actions\HomeAction;
+use touiteur\actions\LikeAction;
 
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 try {
     Connexion::setConfig(__DIR__ . '/conf/db.ini');
@@ -19,5 +22,6 @@ try {
 $d = new Dispatcher($pdo);
 $d->addRoute('default', HomeAction::class)
   ->addRoute('home', HomeAction::class);
+  ->addRoute('like', LikeAction::class);
 
 $d->run();

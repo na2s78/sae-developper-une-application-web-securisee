@@ -37,8 +37,8 @@ class Dispatcher
 
     private function renderPage(string $html): void
     {
-        // Lien du menu en surbrillance pour la page courante
-        $accueil = in_array($this->action, ['default', 'home']) ? ' class="actif"' : '';
+        // L'habillage est centralisé ici : chaque action ne renvoie que le contenu principal.
+        $accueil = in_array($this->action, ['default', 'home'], true) ? ' class="actif"' : '';
 
         echo <<<HTML
 <!DOCTYPE html>
@@ -53,12 +53,13 @@ class Dispatcher
 
 <header class="entete">
     <a href="?action=home" class="logo">
-        <img src="ressources/images_css/touiteur_g.svg" alt="Touiteur">
+        <img src="ressources/images_css/touiteur_txt.svg" alt="Touiteur.app">
     </a>
 
     <form class="recherche" method="GET" action="index.php">
         <input type="hidden" name="action" value="tag">
-        <input name="tag" type="search" placeholder="Rechercher un #tag...">
+        <label class="visuellement-cache" for="recherche-tag">Rechercher un tag</label>
+        <input id="recherche-tag" name="tag" type="search" maxlength="30" placeholder="#tag">
     </form>
 
     <form class="connexion" method="POST" action="?action=connexion">
@@ -86,7 +87,8 @@ class Dispatcher
             <h3>S'abonner à un tag</h3>
             <form method="POST" action="?action=follow" class="abonner">
                 <input type="hidden" name="type" value="tag">
-                <input type="text" name="libelleTag" placeholder="#tag">
+                <label class="visuellement-cache" for="abonnement-tag">Tag à suivre</label>
+                <input id="abonnement-tag" type="text" name="libelleTag" maxlength="30" placeholder="#tag" required>
                 <button type="submit" class="bouton">OK</button>
             </form>
         </div>
@@ -94,7 +96,7 @@ class Dispatcher
 
 </div>
 
-<footer class="pied">Touiteur.app &copy; 2026 - SAE BUT Informatique</footer>
+<footer class="pied">Touiteur.app 2026 - SAE BUT Informatique - NA,RF,KP,AHO,GRN</footer>
 
 </body>
 </html>
