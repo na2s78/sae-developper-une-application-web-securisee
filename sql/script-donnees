@@ -1,12 +1,4 @@
 -- Donnees de test de Touiteur.app
---
--- Comptes de test (email / mot de passe) :
---   nassim.aliouane@touiteur.app   / user1234
---   kevin.pasho@touiteur.app       / user1234
---   romain.fanara@touiteur.app     / user1234
---   adnan.hamedomer@touiteur.app   / user1234
---   gabriel.rodrigues@touiteur.app / user1234
---   admin@touiteur.app             / admin1234  (administrateur)
 
 delete from abonnementtag;
 delete from suivre;

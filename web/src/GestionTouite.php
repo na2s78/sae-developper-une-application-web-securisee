@@ -27,8 +27,8 @@ class GestionTouite
                 u.idUtil,
                 u.nomUtil,
                 u.prenomUtil
-            FROM Touite t
-            JOIN Utilisateur u
+            FROM touite t
+            JOIN utilisateur u
                 ON t.idUtil = u.idUtil
             ORDER BY t.datePub DESC
         ";
@@ -55,8 +55,8 @@ class GestionTouite
                 i.idImage,
                 i.descImage,
                 i.cheminImage
-            FROM Touite t
-            JOIN Utilisateur u
+            FROM touite t
+            JOIN utilisateur u
                 ON t.idUtil = u.idUtil
             LEFT JOIN Image i
                 ON t.idImage = i.idImage
@@ -93,7 +93,7 @@ class GestionTouite
         foreach ($tags as $tag) {
             // 1. Vérifier si le tag existe déjà
             $sql = "SELECT idTag
-                    FROM Tag
+                    FROM tag
                     WHERE LOWER(libelleTag) = LOWER(:libelleTag)";
 
             $stmt = $this->pdo->prepare($sql);
@@ -105,7 +105,7 @@ class GestionTouite
 
             // 2. Si le tag n'existe pas, on le crée et récupère son ID via PDO
             if ($idTag === false) {
-                $sqlInsert = "INSERT INTO Tag (libelleTag, descTag)
+                $sqlInsert = "INSERT INTO tag (libelleTag, descTag)
                               VALUES (:libelleTag, NULL)";
 
                 $stmtInsert = $this->pdo->prepare($sqlInsert);
@@ -118,9 +118,9 @@ class GestionTouite
                 $idTag = (int) $idTag;
             }
 
-            // 3. Vérifier si l'association Touite <-> Tag existe déjà
+            // 3. Vérifier si l'association touite <-> tag existe déjà
             $sqlCheck = "SELECT COUNT(*)
-                         FROM TouiteTag
+                         FROM touitetag
                          WHERE idTouite = :idTouite
                          AND idTag = :idTag";
 
@@ -132,7 +132,7 @@ class GestionTouite
 
             // 4. Si l'association n'existe pas, on l'insère
             if ((int) $stmtCheck->fetchColumn() === 0) {
-                $sqlLink = "INSERT INTO TouiteTag (idTouite, idTag)
+                $sqlLink = "INSERT INTO touitetag (idTouite, idTag)
                             VALUES (:idTouite, :idTag)";
 
                 $stmtLink = $this->pdo->prepare($sqlLink);
@@ -158,8 +158,8 @@ class GestionTouite
                 u.idUtil,
                 u.nomUtil,
                 u.prenomUtil
-            FROM Touite t
-            JOIN Utilisateur u
+            FROM touite t
+            JOIN utilisateur u
                 ON t.idUtil = u.idUtil
             WHERE u.idUtil = :idUtil
             ORDER BY t.datePub DESC
@@ -189,12 +189,12 @@ class GestionTouite
                 u.prenomUtil,
                 tg.idTag,
                 tg.libelleTag
-            FROM Touite t
-            JOIN Utilisateur u
+            FROM touite t
+            JOIN utilisateur u
                 ON t.idUtil = u.idUtil
-            JOIN TouiteTag tt
+            JOIN touitetag tt
                 ON t.idTouite = tt.idTouite
-            JOIN Tag tg
+            JOIN tag tg
                 ON tt.idTag = tg.idTag
             WHERE tg.idTag = :idTag
             ORDER BY t.datePub DESC
@@ -224,12 +224,12 @@ class GestionTouite
                 u.prenomUtil,
                 tg.idTag,
                 tg.libelleTag
-            FROM Touite t
-            JOIN Utilisateur u
+            FROM touite t
+            JOIN utilisateur u
                 ON t.idUtil = u.idUtil
-            JOIN TouiteTag tt
+            JOIN touitetag tt
                 ON t.idTouite = tt.idTouite
-            JOIN Tag tg
+            JOIN tag tg
                 ON tt.idTag = tg.idTag
             WHERE LOWER(tg.libelleTag) = LOWER(:libelleTag)
             ORDER BY t.datePub DESC
