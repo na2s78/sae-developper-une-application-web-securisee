@@ -17,3 +17,4 @@
 | descImage   | Description de l'image    | VARCHAR(100) |
 | cheminImage | Chemin du fichier image   | VARCHAR(255) |
 | nbEval      | Nombre d'évaluation(like) | int          |
+| valeur      | Évaluation d'un touite    | int          |  (1 = like, -1 = dislike)

@@ -1,3 +1,4 @@
+drop table if exists evaluation;
 drop table if exists abonnementtag;
 drop table if exists suivre;
 drop table if exists touitetag;
@@ -70,4 +71,14 @@ create table abonnementtag (
   constraint pk_abonnement primary key (idutil, idtag),
   constraint fk_abo_util foreign key (idutil) references utilisateur (idutil) on delete cascade,
   constraint fk_abo_tag foreign key (idtag) references tag (idtag) on delete cascade
+) engine=innodb;
+
+create table evaluation (
+  idutil int not null,
+  idtouite int not null,
+  valeur int not null,
+  constraint pk_evaluation primary key (idutil, idtouite),
+  constraint ck_valeur check (valeur in (1, -1)),
+  constraint fk_eval_util foreign key (idutil) references utilisateur (idutil) on delete cascade,
+  constraint fk_eval_touite foreign key (idtouite) references touite (idtouite) on delete cascade
 ) engine=innodb;

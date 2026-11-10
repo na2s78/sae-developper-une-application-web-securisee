@@ -4,3 +4,4 @@ idTouite -> texteTouite, datePub, idUtil, idImage, nbEval
 idTag -> libelleTag, descTag
 libelleTag -> idTag
 idImage -> descImage, cheminImage
+idUtil, idTouite -> valeur

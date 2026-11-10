@@ -5,6 +5,8 @@ Touite ("idTouite", texteTouite, datePub, nbEval, #idUtil, #idImage)
 TouiteTag ("#idTouite", "#idTag")
 Suivre ("#idSuiveur", "#idSuivi")
 AbonnementTag ("#idUtil", "#idTag")
+Evaluation ("#idUtil", "#idTouite", valeur)
+
 
 
 (Clés primaires entre guillemets "...", clés étrangères précédées de #)
