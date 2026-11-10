@@ -32,9 +32,10 @@
 
     - Romain :
         - Création et peaufinage d'un design cohérent avec le thème (partagé sur la maquette de Nassim)
-        - Création d'une architecture, correcte, minimale et optimisée pour répartir le travail et le code
-        - Aide pour mes collègues afin de comprendre comment interragit cette architecture 
+        - Création d'une architecture, correcte, minimale et optimisée pour répartir le code
+        - Aide mes collègues afin qu'ils comprennent comment interragit cette architecture PHP
         - Mise en place de sécutités 'frontstack' sur le format des touites
         - Travail sur le like, le touite détaillé, le formulaire d'envoi, la mise en place des vues
         - Mise en place d'une branche personnelle de développement
-        - Collaboration sur le dispatcher, le feed, le home
+        - Collaboration sur le dispatcher et le feed
+        - Réécriture des exceptions pour un débugage plus rapide
