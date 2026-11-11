@@ -31,7 +31,7 @@ $rechercheTag = $rechercheTag ?? false;
     <?php foreach ($touites as $touite): ?>
         <?php $texteCourt = $this->extraitTexte((string) $touite['texteTouite']); ?>
         <article class="carte touite">
-            <header class="touite-haut"><img <?= $this->logoAttribut((int) $touite['idUtil']) ?> src="ressources/images_css/touiteur_logo.svg" alt=""><div><a class="auteur" href="?action=user&amp;id=<?= (int) $touite['idUtil'] ?>"><?= $this->e($touite['prenomUtil'] . ' ' . $touite['nomUtil']) ?></a><time class="date" datetime="<?= $this->e($touite['datePub']) ?>"><?= $this->e($touite['datePub']) ?></time></div></header>
+            <header class="touite-haut"><img <?= $this->logoAttribut((int) $touite['idUtil']) ?> src="ressources/images_css/touiteur_logo.svg" alt=""><div class="identite-auteur"><div class="nom-et-suivi"><a class="auteur" href="?action=user&amp;id=<?= (int) $touite['idUtil'] ?>"><?= $this->e($touite['prenomUtil'] . ' ' . $touite['nomUtil']) ?></a><?= $this->boutonSuivre((int) $touite['idUtil']) ?></div><time class="date" datetime="<?= $this->e($touite['datePub']) ?>"><?= $this->e($touite['datePub']) ?></time></div></header>
             <p class="touite-texte"><?= $this->rendreTexte($texteCourt) ?></p>
             <footer class="touite-bas"><span class="date">Publié par <?= $this->e($touite['prenomUtil'] . ' ' . $touite['nomUtil']) ?></span><?= $this->reactions((int) $touite['idTouite'], (int) $touite['nbEval']) ?><a class="lien-detail" href="?action=detail&amp;id=<?= (int) $touite['idTouite'] ?>">Voir le détail →</a></footer>
         </article>

@@ -85,12 +85,25 @@ abstract class Action
     {
         $id = (int) $idTouite;
         return '<div class="reactions" aria-label="Évaluer ce touite">'
-            . '<input class="reaction-toggle" type="checkbox" id="like-' . $id . '">'
+            . '<input class="reaction-toggle" type="radio" name="reaction-' . $id . '" value="like" id="like-' . $id . '">'
             . '<label class="reaction reaction-like" for="like-' . $id . '" title="J’aime" aria-label="J’aime"></label>'
-            . '<span class="score">' . (int) $score . '</span>'
-            . '<input class="reaction-toggle" type="checkbox" id="dislike-' . $id . '">'
+            . '<input class="reaction-toggle" type="radio" name="reaction-' . $id . '" value="dislike" id="dislike-' . $id . '">'
             . '<label class="reaction reaction-dislike" for="dislike-' . $id . '" title="Je n’aime pas" aria-label="Je n’aime pas"></label>'
+            . '<span class="score">' . (int) $score . '</span>'
             . '</div>';
+    }
+
+    /** Affiche le suivi uniquement pour un autre utilisateur. */
+    protected function boutonSuivre(int $idUtil): string
+    {
+        if (!isset($_SESSION['idUtil']) || (int) $_SESSION['idUtil'] === $idUtil) {
+            return '';
+        }
+        return '<form class="suivre-form" method="post" action="?action=follow">'
+            . '<input type="hidden" name="type" value="user">'
+            . '<input type="hidden" name="idUtilSuivi" value="' . $idUtil . '">'
+            . '<button class="bouton bouton-suivre" type="submit">Suivre</button>'
+            . '</form>';
     }
 
     protected function redirect(string $url = '?action=home'): void

@@ -190,6 +190,28 @@ input:focus, textarea:focus {
     margin-bottom: 9px;
 }
 
+.identite-auteur {
+    min-width: 0;
+}
+
+.nom-et-suivi {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.suivre-form {
+    display: inline;
+    margin: 0;
+}
+
+.bouton-suivre {
+    padding: 3px 10px;
+    font-size: .78rem;
+    letter-spacing: .03em;
+}
+
 .logo-touite {
     width: 38px;
     height: 38px;
