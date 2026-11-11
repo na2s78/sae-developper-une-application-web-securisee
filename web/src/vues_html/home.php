@@ -1,11 +1,4 @@
 <?php
-$action = $this;
-$renderText = static function (string $texte) use ($action): string {
-    $safe = nl2br($action->e($texte), false);
-    return (string) preg_replace_callback('/(^|[\s])#([\p{L}\p{N}_-]+)/u', static function (array $match) use ($action): string {
-        return $match[1] . '<a class="tag" href="?action=tag&amp;tag=' . rawurlencode($match[2]) . '">#' . $action->e($match[2]) . '</a>';
-    }, $safe);
-};
 $message = $message ?? null;
 $titre = $titre ?? 'Derniers touites';
 $touites = $touites ?? [];
@@ -22,12 +15,5 @@ $touites = $touites ?? [];
 <?php if ($touites === []): ?>
     <p class="carte">Aucun touite à afficher.</p>
 <?php else: ?>
-    <?php foreach ($touites as $touite): ?>
-        <article class="carte touite">
-            <header class="touite-haut"><img class="logo-touite" src="ressources/images_css/touiteur_logo.svg" alt=""><div><a class="auteur" href="?action=user&amp;id=<?= (int) $touite['idUtil'] ?>"><?= $this->e(($touite['prenomUtil'] ?? '') . ' ' . ($touite['nomUtil'] ?? '')) ?></a><time class="date" datetime="<?= $this->e($touite['datePub'] ?? '') ?>"><?= $this->e($touite['datePub'] ?? '') ?></time></div></header>
-            <p class="touite-texte"><?= $renderText((string) ($touite['texteTouite'] ?? '')) ?></p>
-            <?php if (!empty($touite['cheminImage'])): ?><img class="touite-image" src="<?= $this->e($touite['cheminImage']) ?>" alt="Image associée au touite"><?php endif; ?>
-            <footer class="touite-bas"><span class="date">Publié par <?= $this->e(($touite['prenomUtil'] ?? '') . ' ' . ($touite['nomUtil'] ?? '')) ?></span><a class="lien-detail" href="?action=detail&amp;id=<?= (int) $touite['idTouite'] ?>">Voir le détail →</a></footer>
-        </article>
-    <?php endforeach; ?>
+    <?= $this->renderView('liste_touites', ['touites' => $touites]) ?>
 <?php endif; ?>

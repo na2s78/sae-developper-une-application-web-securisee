@@ -5,6 +5,10 @@ use PDO;
 
 class GestionTouite
 {
+    // Un tag : un # au début d'un mot (début de texte ou après un espace), suivi de lettres, chiffres ou _
+    // $m[1] = l'espace avant le #, $m[2] = le nom du tag
+    public const REGEX_TAG = '/(^|\s)#([\p{L}\p{N}_]+)/u';
+
     private PDO $pdo;
 
     public function __construct(PDO $pdo)
@@ -97,8 +101,16 @@ class GestionTouite
 
     public function enregistrerTags(int $idTouite, string $texte): void
     {
-        preg_match_all('/#([\p{L}\p{N}_-]+)/u', $texte, $matches);
-        foreach (array_unique($matches[1]) as $libelle) {
+        preg_match_all(self::REGEX_TAG, $texte, $resultats);
+
+        foreach ($resultats[2] as $libelle) {
+            $libelle = mb_strtolower($libelle); // #Foot et #foot sont le même tag
+
+            if (mb_strlen($libelle) > 30) {
+                continue; // libelleTag est un varchar(30)
+            }
+
+            // On cherche le tag, et on le crée s'il n'existe pas encore
             $tag = $this->getTagByLibelle($libelle);
             if ($tag === null) {
                 $insert = $this->pdo->prepare('INSERT INTO tag (libelleTag, descTag) VALUES (:libelle, NULL)');
@@ -107,9 +119,21 @@ class GestionTouite
             } else {
                 $idTag = (int) $tag['idTag'];
             }
-            $link = $this->pdo->prepare('INSERT IGNORE INTO touitetag (idTouite, idTag) VALUES (:idTouite, :idTag)');
-            $link->execute([':idTouite' => $idTouite, ':idTag' => $idTag]);
+
+            // On lie le tag au touite (INSERT IGNORE : pas d'erreur si le lien existe déjà)
+            $lien = $this->pdo->prepare('INSERT IGNORE INTO touitetag (idTouite, idTag) VALUES (:idTouite, :idTag)');
+            $lien->execute([':idTouite' => $idTouite, ':idTag' => $idTag]);
         }
+    }
+
+    // Tags dont le nom contient le texte cherché (suggestions de la recherche)
+    public function getTagsSimilaires(string $recherche, int $limite = 5): array
+    {
+        $stmt = $this->pdo->prepare('SELECT libelleTag FROM tag WHERE libelleTag LIKE :motif ORDER BY libelleTag LIMIT :limite');
+        $stmt->bindValue(':motif', '%' . $recherche . '%', PDO::PARAM_STR);
+        $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
     }
 
     public function getTagByLibelle(string $libelle): ?array
