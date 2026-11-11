@@ -1,33 +1,52 @@
 <?php
-
 namespace touiteur;
 
 use PDO;
-use Exception;
 
-class Connexion {
+class CompteConnex
+{
+    private PDO $pdo;
 
-    private static $pdo = null;
-
-    public static function setConfig($fichier) {
-        $config = parse_ini_file($fichier);
-
-        if (!$config) {
-            throw new Exception("Impossible de lire le fichier db.ini");
-        }
-
-        $dsn = "mysql:host=" . $config['host'] . ";dbname=" . $config['dbname'] . ";charset=utf8";
-
-        self::$pdo = new PDO($dsn, $config['user'], $config['password'], [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-        ]);
+    public function __construct(PDO $pdo)
+    {
+        $this->pdo = $pdo;
     }
 
-    public static function makeConnection() {
-        if (self::$pdo === null) {
-            throw new Exception("Connexion non initialisée");
+    public function execute(): string
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
         }
-        return self::$pdo;
+        if (($_GET['action'] ?? '') === 'deconnexion') {
+            $_SESSION = [];
+            session_destroy();
+            header('Location: ?action=home', true, 303);
+            exit;
+        }
+
+        $erreur = null;
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $email = trim((string) ($_POST['mail'] ?? ''));
+            $motDePasse = (string) ($_POST['pw'] ?? '');
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $erreur = 'Adresse e-mail invalide.';
+            } else {
+                $stmt = $this->pdo->prepare('SELECT idUtil, prenomUtil, nomUtil, mdpUtil FROM utilisateur WHERE LOWER(emailUtil) = LOWER(:email)');
+                $stmt->execute([':email' => $email]);
+                $utilisateur = $stmt->fetch(PDO::FETCH_ASSOC);
+                if ($utilisateur && password_verify($motDePasse, $utilisateur['mdpUtil'])) {
+                    session_regenerate_id(true);
+                    $_SESSION['idUtil'] = (int) $utilisateur['idUtil'];
+                    $_SESSION['prenomUtil'] = $utilisateur['prenomUtil'];
+                    $_SESSION['nomUtil'] = $utilisateur['nomUtil'];
+                    header('Location: ?action=home', true, 303);
+                    exit;
+                }
+                $erreur = 'Identifiants incorrects.';
+            }
+        }
+
+        $message = $erreur === null ? '' : '<p class="alerte">' . htmlspecialchars($erreur, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</p>';
+        return '<section class="carte formulaire-compte"><h1>Connexion</h1>' . $message . '<form method="post" action="?action=connexion"><label for="connexion-mail">E-mail</label><input id="connexion-mail" type="email" name="mail" required><label for="connexion-pw">Mot de passe</label><input id="connexion-pw" type="password" name="pw" required><button class="bouton" type="submit">Se connecter</button></form></section>';
     }
 }

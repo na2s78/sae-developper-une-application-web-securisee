@@ -1,5 +1,5 @@
 <?php
-// Fonctionnalité 5 : afficher les touites associés à un tag (et recherche par tag)
+// Fonctionnalité 5 : afficher les touites associés à un tag et les suggestions.
 namespace touiteur\actions;
 
 use touiteur\GestionTouite;
@@ -8,17 +8,11 @@ class TagAction extends Action
 {
     public function execute(): string
     {
-        // "#Foot", "foot" et " foot " donnent tous "foot"
-        $libelle = trim($_GET['tag'] ?? '');
-        $libelle = mb_strtolower(ltrim($libelle, '#'));
-
+        $libelle = mb_strtolower(ltrim(trim((string) ($_GET['tag'] ?? '')), '#'));
         if ($libelle === '') {
             $this->redirect('?action=home');
         }
-
-        // Un tag ne contient que des lettres, chiffres ou _ (30 caractères max)
         $valide = preg_match('/^[\p{L}\p{N}_]{1,30}$/u', $libelle) === 1;
-
         $touites = [];
         $similaires = [];
         if ($valide) {
@@ -28,12 +22,12 @@ class TagAction extends Action
                 $similaires = $gestion->getTagsSimilaires($libelle);
             }
         }
-
-        return $this->renderView('tag', [
-            'libelle' => $libelle,
-            'valide' => $valide,
+        return $this->renderView('home', [
+            'titre' => '#' . $libelle,
+            'message' => !$valide ? 'Un tag ne contient que des lettres, des chiffres et des _ (30 caractères maximum).' : null,
             'touites' => $touites,
             'similaires' => $similaires,
+            'rechercheTag' => true,
         ]);
     }
 }

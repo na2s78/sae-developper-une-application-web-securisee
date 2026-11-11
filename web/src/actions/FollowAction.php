@@ -4,7 +4,7 @@
 
 namespace touiteur\actions;
 
-use GestionTouite;
+use touiteur\GestionTouite;
 use PDO;
 
 class FollowAction extends Action

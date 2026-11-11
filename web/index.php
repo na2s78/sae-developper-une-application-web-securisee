@@ -24,7 +24,6 @@ try {
 }
 
 $d = new Dispatcher($pdo);
-$d = new Dispatcher($pdo);
 $d->addRoute('default', HomeAction::class)
   ->addRoute('home', HomeAction::class)
   ->addRoute('mur', HomeAction::class)
