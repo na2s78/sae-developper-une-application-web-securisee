@@ -26,7 +26,7 @@
     - Nassim :
         - Création du html global (maquette)
         - Classe Connexion
-        - Dossier conf avec db.ini.exemple et la protection avec .htaccess
+        - Dossier conf avec db.ini.md et la protection avec .htaccess
         - Ajout de l'autoloader
         - Mise en page
         - 14. Influenceurs (page Top touiteurs)
