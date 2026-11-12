@@ -32,7 +32,7 @@ abstract class Action
         return htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     }
 
-    /** Echappe un texte puis transforme ses hashtags valides en liens internes. */
+    /** Échappe un texte puis transforme ses hashtags valides en liens internes. */
     protected function rendreTexte(string $texte): string
     {
         $texte = nl2br($this->e($texte), false);
@@ -43,7 +43,9 @@ abstract class Action
                 if (mb_strlen($tag) > 30) {
                     return $match[0];
                 }
-                return $match[1] . '<a class="tag" href="?action=tag&amp;tag=' . rawurlencode($tag) . '">#' . $this->e($tag) . '</a>';
+                return $match[1]
+                    . '<a class="tag" href="?action=tag&amp;tag=' . rawurlencode($tag) . '">#'
+                    . $this->e($tag) . '</a>';
             },
             $texte
         );
@@ -63,7 +65,7 @@ abstract class Action
         return $extrait . '…';
     }
 
-    /** Le logo personnel reste bleu, les autres reçoivent une teinte aléatoire par page. */
+    /** Le logo personnel reste bleu, les autres reçoivent une teinte par page. */
     protected function logoAttribut(int $idUtil): string
     {
         $idConnecte = isset($_SESSION['idUtil']) ? (int) $_SESSION['idUtil'] : 0;
@@ -73,37 +75,69 @@ abstract class Action
         if (!isset($this->teintesLogo[$idUtil])) {
             $this->teintesLogo[$idUtil] = random_int(25, 335);
         }
-        return 'class="logo-touite logo-autre" style="--logo-teinte:' . $this->teintesLogo[$idUtil] . 'deg"';
+        return 'class="logo-touite logo-autre" style="--logo-teinte:'
+            . $this->teintesLogo[$idUtil] . 'deg"';
     }
 
     /**
-     * Contrôles purement visuels : aucun formulaire n'est envoyé tant que
-     * LikeAction n'est pas implémentée. Les cases permettent toutefois de
-     * conserver l'état cliqué pendant l'affichage de la page.
+     * Affiche les boutons like/dislike et le score. La note existante détermine
+     * l'état visuel du bouton. LikeAction maintient nbEval = nombre de likes.
      */
     protected function reactions(int $idTouite, int $score): string
     {
         $id = (int) $idTouite;
+        $vote = null;
+        $idConnecte = (int) ($_SESSION['idUtil'] ?? 0);
+        if ($idConnecte > 0) {
+            $stmt = $this->pdo->prepare(
+                'SELECT valeur FROM evaluation WHERE idUtil = :idUtil AND idTouite = :idTouite'
+            );
+            $stmt->execute([':idUtil' => $idConnecte, ':idTouite' => $id]);
+            $valeur = $stmt->fetchColumn();
+            $vote = $valeur === false ? null : (int) $valeur;
+        }
+
+        $retour = $this->e($_SERVER['REQUEST_URI'] ?? '?action=home');
+        $bouton = function (int $valeur, string $classe, string $titre) use ($id, $vote, $retour): string {
+            $actif = $vote === $valeur;
+            return '<form class="reaction-form" method="post" action="?action=like">'
+                . '<input type="hidden" name="idTouite" value="' . $id . '">'
+                . '<input type="hidden" name="valeur" value="' . $valeur . '">'
+                . '<input type="hidden" name="retour" value="' . $retour . '">'
+                . '<button class="reaction ' . $classe . ($actif ? ' actif' : '') . '" type="submit"'
+                . ' title="' . $titre . '" aria-label="' . $titre . '" aria-pressed="'
+                . ($actif ? 'true' : 'false') . '"></button></form>';
+        };
+
         return '<div class="reactions" aria-label="Évaluer ce touite">'
-            . '<input class="reaction-toggle" type="radio" name="reaction-' . $id . '" value="like" id="like-' . $id . '">'
-            . '<label class="reaction reaction-like" for="like-' . $id . '" title="J’aime" aria-label="J’aime"></label>'
-            . '<input class="reaction-toggle" type="radio" name="reaction-' . $id . '" value="dislike" id="dislike-' . $id . '">'
-            . '<label class="reaction reaction-dislike" for="dislike-' . $id . '" title="Je n’aime pas" aria-label="Je n’aime pas"></label>'
-            . '<span class="score">' . (int) $score . '</span>'
+            . $bouton(1, 'reaction-like', 'J’aime')
+            . $bouton(-1, 'reaction-dislike', 'Je n’aime pas')
+            . '<span class="score" title="Nombre de likes">' . (int) $score . '</span>'
             . '</div>';
     }
 
-    /** Affiche le suivi uniquement pour un autre utilisateur. */
+    /** Affiche Suivre/Ne plus suivre pour un autre utilisateur connecté. */
     protected function boutonSuivre(int $idUtil): string
     {
-        if (!isset($_SESSION['idUtil']) || (int) $_SESSION['idUtil'] === $idUtil) {
+        $idConnecte = (int) ($_SESSION['idUtil'] ?? 0);
+        if ($idConnecte <= 0 || $idConnecte === $idUtil) {
             return '';
         }
+
+        $stmt = $this->pdo->prepare(
+            'SELECT 1 FROM suivre WHERE idSuiveur = :idSuiveur AND idSuivi = :idSuivi'
+        );
+        $stmt->execute([':idSuiveur' => $idConnecte, ':idSuivi' => $idUtil]);
+        $suit = $stmt->fetchColumn() !== false;
+
         return '<form class="suivre-form" method="post" action="?action=follow">'
             . '<input type="hidden" name="type" value="user">'
             . '<input type="hidden" name="idUtilSuivi" value="' . $idUtil . '">'
-            . '<button class="bouton bouton-suivre" type="submit">Suivre</button>'
-            . '</form>';
+            . '<input type="hidden" name="mode" value="' . ($suit ? 'neplus' : 'suivre') . '">'
+            . '<input type="hidden" name="retour" value="'
+            . $this->e($_SERVER['REQUEST_URI'] ?? '?action=home') . '">'
+            . '<button class="bouton bouton-suivre' . ($suit ? ' bouton-contour' : '') . '" type="submit">'
+            . ($suit ? 'Ne plus suivre' : 'Suivre') . '</button></form>';
     }
 
     protected function redirect(string $url = '?action=home'): void

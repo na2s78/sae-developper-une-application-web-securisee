@@ -9,7 +9,7 @@ use PDO;
 
 class FollowAction extends Action
 {
-    private PDO $pdo;
+    protected PDO $pdo;
 
     public function __construct(PDO $pdo)
     {
