@@ -14,16 +14,18 @@
         - Conception de la base tables et relations
         - Script SQL de creation et triggers
         - Donnees de test et rapport   
+        - Choix d'une fonctionnalité PHP en plus chacun
 
     - Romain Adnan et Gabriel Partie gloable PHP
     
         - Liste des touites et page de detail
-        - Formulaire pour poster tags et upload d images
+        - Formulaire pour poster tags et upload d'images
         - Connexion des utilisateurs et mise en ligne sur webetu
 
 ## En détail
 
-    - Nassim :
+    - Nassim (na2s78) :
+
         - Création du html global (maquette)
         - Classe Connexion
         - Dossier conf avec db.ini.md et la protection avec .htaccess
@@ -31,12 +33,23 @@
         - Mise en page
         - 14. Influenceurs (page Top touiteurs)
 
-    - Romain :
-        - Création et peaufinage d'un design cohérent avec le thème (partagé sur la maquette de Nassim)
-        - Création d'une architecture, correcte, minimale et optimisée pour répartir le code
-        - Aide mes collègues afin qu'ils comprennent comment interragit cette architecture PHP
-        - Mise en place de sécutités 'frontstack' sur le format des touites
-        - Travail sur le like, le touite détaillé, le formulaire d'envoi, la mise en place des vues
-        - Mise en place d'une branche personnelle de développement
-        - Collaboration sur le dispatcher et le feed
-        - Réécriture des exceptions pour un débugage plus rapide
+
+    - Romain (ryoasis) :
+
+        - Peaufinage d'un design cohérent avec le thème (maquette)
+        - Création d'une architecture correcte et minimale pour répartir le code
+        - Mise en place de sécutités sur le format des touites
+        - Travail sur le touite détaillé, le formulaire d'envoi, la mise en place des vues
+            donc les fonctionnalités 2, 6, 7, 10, 13
+        - Mise en place d'une branche personnelle de développement pour le commit principal du dépôt
+        - Collaboration sur le dispatcher, la connexion, la recherche et le like
+        - Vérification et optimissation globale pour Linux
+
+
+    - Gabriel (RodriguesNetoGab) :
+
+
+    - Kevin (kevinpasK) :
+
+
+    - Adnan (Adnan Hamed Omer) :

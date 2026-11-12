@@ -45,10 +45,6 @@ class FormulaireAction extends Action
                     $gestion = new GestionTouite($this->pdo);
                     $gestion->publierTouite($idUtil, $texte, $cheminImage);
 
-                    // GestionTouite incrémente nbTouites et le trigger
-                    // trg_maj_nb_touites l'incrémente aussi. Comme on ne modifie
-                    // pas GestionTouite.php, on remet le compteur à sa valeur
-                    // dérivée réelle après insertion (plutôt que le laisser doublé).
                     $stmt = $this->pdo->prepare(
                         'UPDATE utilisateur
                          SET nbTouites = (SELECT COUNT(*) FROM touite WHERE idUtil = :idUtilCompte)
@@ -96,7 +92,6 @@ class FormulaireAction extends Action
             . 'apercu.src = URL.createObjectURL(fichier); apercu.hidden = false; });</script>';
     }
 
-    /** Enregistre une image téléversée et renvoie son chemin relatif, ou null. */
     private function enregistrerImage(): ?string
     {
         if (!isset($_FILES['image']) || !is_array($_FILES['image'])) {
@@ -139,7 +134,6 @@ class FormulaireAction extends Action
         return 'ressources/images_upload/' . $nom;
     }
 
-    /** Supprime l'image déposée si la publication échoue. */
     private function supprimerImage(?string $chemin): void
     {
         if ($chemin === null || $chemin === '') {

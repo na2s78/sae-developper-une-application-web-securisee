@@ -9,12 +9,9 @@ class UserAction extends Action
     public function execute(): string
     {
         $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
-
-        // "Mon profil" (sans id dans l'URL) : on prend l'utilisateur connecté
         if (!$id && isset($_SESSION['idUtil'])) {
             $id = (int) $_SESSION['idUtil'];
         }
-
         $utilisateur = null;
         $touites = [];
         if ($id) {

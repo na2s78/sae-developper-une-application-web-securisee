@@ -39,7 +39,7 @@ class FollowAction extends Action
 
         $this->redirect($this->urlRetour());
     }
-    /** Fonctionnalité 10 : suivre ou ne plus suivre un utilisateur. */
+    // Fonctionnalité 10 : suivre ou ne plus suivre un utilisateur
     private function traiterUtilisateur(GestionTouite $gestion, int $idUtil, string $mode): void
     {
         $idSuivi = filter_input(INPUT_POST, 'idUtilSuivi', FILTER_VALIDATE_INT, [
@@ -60,7 +60,7 @@ class FollowAction extends Action
         }
     }
 
-    /** Fonctionnalité 11 : s'abonner ou se désabonner d'un tag. */
+    // Fonctionnalité 11 : s'abonner ou se désabonner d'un tag.
     private function traiterTag(GestionTouite $gestion, int $idUtil, string $mode): void
     {
         $idTag = filter_input(INPUT_POST, 'idTag', FILTER_VALIDATE_INT, [
@@ -86,7 +86,6 @@ class FollowAction extends Action
                     $insert->execute([':libelle' => $libelle]);
                     $idTag = (int) $this->pdo->lastInsertId();
                 } catch (PDOException $exception) {
-                    // Un autre POST a pu créer le même tag simultanément.
                     $tag = $gestion->getTagByLibelle($libelle);
                     if ($tag === null) {
                         throw $exception;
@@ -107,7 +106,6 @@ class FollowAction extends Action
         }
     }
 
-    /** Le retour est limité à une URL du site pour éviter un open redirect. */
     private function urlRetour(): string
     {
         foreach ([$_POST['retour'] ?? '', $_SERVER['HTTP_REFERER'] ?? ''] as $candidat) {

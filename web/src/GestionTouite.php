@@ -123,10 +123,10 @@ class GestionTouite
         preg_match_all(self::REGEX_TAG, $texte, $resultats);
 
         foreach ($resultats[2] as $libelle) {
-            $libelle = mb_strtolower($libelle); // #Foot et #foot sont le même tag
+            $libelle = mb_strtolower($libelle);
 
             if (mb_strlen($libelle) > 30) {
-                continue; // libelleTag est un varchar(30)
+                continue;
             }
 
             // On cherche le tag, et on le crée s'il n'existe pas encore
@@ -145,7 +145,6 @@ class GestionTouite
         }
     }
 
-    // Tags dont le nom contient le texte cherché (suggestions de la recherche)
     public function getTagsSimilaires(string $recherche, int $limite = 5): array
     {
         $stmt = $this->pdo->prepare('SELECT libelleTag FROM tag WHERE libelleTag LIKE :motif ORDER BY libelleTag LIMIT :limite');
@@ -190,7 +189,7 @@ class GestionTouite
         $stmt->execute([':idUtil' => $idUtil, ':idTag' => $idTag]);
     }
 
-    /** Retourne les tags suivis, triés par libellé, pour la colonne latérale. */
+    /** Retourne les tags suivis, triés par libellé à droite */
     public function getTagsSuivis(int $idUtil): array
     {
         $stmt = $this->pdo->prepare(
@@ -233,21 +232,8 @@ class GestionTouite
         );
     }
 
-    /** Recherche d’utilisateurs pour les requêtes préfixées par @. */
-    public function rechercherUtilisateurs(string $mot): array
-    {
-        $stmt = $this->pdo->prepare(
-            'SELECT idUtil, nomUtil, prenomUtil, roleUtil
-             FROM utilisateur
-             WHERE nomUtil LIKE :mot OR prenomUtil LIKE :mot
-             ORDER BY prenomUtil ASC, nomUtil ASC'
-        );
-        $stmt->execute([':mot' => '%' . $mot . '%']);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-
     // Fonctionnalité 14 : les utilisateurs classés par nombre de suiveurs
+    // nous suivons les consignes mais l'ordre devrait être décroissant logiquement
     public function getInfluenceurs(): array
     {
         $stmt = $this->pdo->prepare(

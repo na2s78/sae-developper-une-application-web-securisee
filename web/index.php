@@ -22,7 +22,7 @@ try {
     Connexion::setConfig(__DIR__ . '/conf/db.ini');
     $pdo = Connexion::makeConnection();
 } catch (\Throwable $exception) {
-    // Détail technique dans le journal, pas dans la réponse HTTP.
+    // permet de connaître l'erreur (en général la base est mal implémentée je crois)
     error_log('Connexion base Touiteur : ' . $exception->getMessage());
     http_response_code(500);
     exit('Erreur de connexion à la base de données.');

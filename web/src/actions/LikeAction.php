@@ -1,6 +1,5 @@
 <?php
-// Fonctionnalité 7 : noter un touite avec un like (1) ou un dislike (-1).
-// La table evaluation garantit une seule note par utilisateur et par touite.
+// Fonctionnalité 7 : noter un touite avec un like (1) ou un dislike (-1). On ne va pas en dessous de zéro. Du moins pas encore.
 namespace touiteur\actions;
 
 use Throwable;
@@ -33,8 +32,6 @@ final class LikeAction extends Action
 
         try {
             $this->pdo->beginTransaction();
-
-            // Le verrou évite que deux votes simultanés écrasent leur résultat.
             $verrou = $this->pdo->prepare(
                 'SELECT idTouite FROM touite WHERE idTouite = :idTouite FOR UPDATE'
             );
@@ -49,7 +46,6 @@ final class LikeAction extends Action
             );
             $stmt->execute([':idUtil' => $idUtil, ':idTouite' => $idTouite]);
             $noteActuelle = $stmt->fetchColumn();
-            // nbEval est le score net : un like vaut +1 et un dislike vaut -1.
             $variationScore = 0;
 
             if ($noteActuelle === false) {
@@ -64,14 +60,12 @@ final class LikeAction extends Action
                 ]);
                 $variationScore = $valeur;
             } elseif ((int) $noteActuelle === $valeur) {
-                // Cliquer une seconde fois sur le même bouton retire la note.
                 $stmt = $this->pdo->prepare(
                     'DELETE FROM evaluation WHERE idUtil = :idUtil AND idTouite = :idTouite'
                 );
                 $stmt->execute([':idUtil' => $idUtil, ':idTouite' => $idTouite]);
                 $variationScore = -$valeur;
             } else {
-                // Le clic sur l'autre bouton remplace la note précédente.
                 $stmt = $this->pdo->prepare(
                     'UPDATE evaluation SET valeur = :valeur
                      WHERE idUtil = :idUtil AND idTouite = :idTouite'
@@ -81,11 +75,9 @@ final class LikeAction extends Action
                     ':idUtil' => $idUtil,
                     ':idTouite' => $idTouite,
                 ]);
-                // Remplacer une note par son opposée modifie le score de 2.
                 $variationScore = $valeur * 2;
             }
 
-            // Le plancher à zéro empêche un score négatif.
             $stmt = $this->pdo->prepare(
                 'UPDATE touite
                  SET nbEval = GREATEST(nbEval + :variationScore, 0)
@@ -106,7 +98,6 @@ final class LikeAction extends Action
         $this->redirect($this->urlRetour($idTouite));
     }
 
-    /** Valide une URL de retour interne, sans accepter de redirection externe. */
     private function urlRetour(?int $idTouite): string
     {
         $candidat = trim((string) ($_POST['retour'] ?? ''));
@@ -115,7 +106,6 @@ final class LikeAction extends Action
                 && preg_match('/^\?action=[a-z]+(&[a-zA-Z0-9_=%+.,-]*)?$/', $candidat) === 1) {
                 return $candidat;
             }
-
             $parts = parse_url($candidat);
             if ($parts !== false) {
                 $hostValide = !isset($parts['host']);

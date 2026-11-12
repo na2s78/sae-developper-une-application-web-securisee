@@ -39,7 +39,6 @@ class Dispatcher
     {
         $accueil = in_array($this->action, ['default', 'home'], true) ? ' class="actif"' : '';
         $idUtil = (int) ($_SESSION['idUtil'] ?? 0);
-        // Lien vers les influenceurs, visible pour un administrateur
         $lienAdmin = '';
         if ($idUtil > 0) {
             $connecte = (new GestionTouite($this->pdo))->getUtilisateurById($idUtil);

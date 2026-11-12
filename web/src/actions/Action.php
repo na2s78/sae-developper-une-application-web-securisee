@@ -36,7 +36,6 @@ abstract class Action
         return htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     }
 
-    /** Échappe un texte puis transforme ses hashtags valides en liens internes. */
     protected function rendreTexte(string $texte): string
     {
         $texte = nl2br($this->e($texte), false);
@@ -55,7 +54,6 @@ abstract class Action
         );
     }
 
-    /** Retourne un extrait sans couper le dernier mot. */
     protected function extraitTexte(string $texte, int $max = 100): string
     {
         if (mb_strlen($texte) <= $max) {
@@ -69,7 +67,7 @@ abstract class Action
         return $extrait . '...';
     }
 
-    /** Le logo personnel reste bleu, les autres reçoivent une couleur de la palette. */
+    // Le logo personnel reste bleu (noir admin), les autres reçoivent une autre couleur
     protected function logoAttribut(int $idUtil, int $roleUtil = 1): string
     {
         $idConnecte = isset($_SESSION['idUtil']) ? (int) $_SESSION['idUtil'] : 0;
@@ -90,10 +88,6 @@ abstract class Action
         return $roleUtil === 100 ? ' - Admin' : '';
     }
 
-    /**
-     * Affiche les boutons like/dislike et le score. La note existante détermine
-     * l'état visuel du bouton. LikeAction maintient nbEval comme score net.
-     */
     protected function reactions(int $idTouite, int $score): string
     {
         $id = (int) $idTouite;
@@ -127,7 +121,6 @@ abstract class Action
             . '</div>';
     }
 
-    /** Affiche Suivre/Ne plus suivre pour un autre utilisateur connecté. */
     protected function boutonSuivre(int $idUtil): string
     {
         $idConnecte = (int) ($_SESSION['idUtil'] ?? 0);
