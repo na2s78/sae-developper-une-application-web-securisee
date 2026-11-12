@@ -54,7 +54,9 @@ class Dispatcher
                 'UTF-8'
             );
             $profilHeader = '<a class="profil-rond" href="?action=profil" title="Mon profil" aria-label="Mon profil">'
-                . $initiales . '</a>';
+                . $initiales . '</a><a class="profil-lien" href="?action=profil">Mon profil</a>'
+                . '<a class="deconnexion-lien" href="?action=deconnexion" title="Se déconnecter" aria-label="Se déconnecter">'
+                . '<img src="ressources/images_css/log_out.svg" alt=""></a>';
             $connexionHeader = '';
         }
         $tagsSuivisHtml = '<div class="carte tags-suivis"><h3>Mes tags suivis</h3>';
@@ -100,7 +102,7 @@ class Dispatcher
     <form class="recherche" method="GET" action="index.php">
         <input type="hidden" name="action" value="tag">
         <label class="visuellement-cache" for="recherche-tag">Rechercher un tag</label>
-        <input id="recherche-tag" name="tag" type="search" maxlength="30" placeholder="Rechercher sur Touiteur...">
+        <input id="recherche-tag" name="q" type="search" maxlength="60" placeholder="Rechercher sur Touiteur...">
     </form>
 
     {$connexionHeader}
@@ -113,7 +115,6 @@ class Dispatcher
         <a href="?action=home"{$accueil}>Accueil</a>
         <a href="?action=mur">Mon mur</a>
         <a href="?action=formulaire">Publier</a>
-        <a href="?action=profil">Mon profil</a>
     </nav>
 
     <main class="fil">

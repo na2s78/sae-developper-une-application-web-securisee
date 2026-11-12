@@ -99,7 +99,7 @@ input:focus, textarea:focus {
 
 .recherche input {
     width: 100%;
-    background: var(--fond);
+    background: #fff;
 }
 
 .connexion {
@@ -119,15 +119,44 @@ input:focus, textarea:focus {
     height: 40px;
     margin-left: auto;
     border-radius: 50%;
-    background: var(--bleu);
-    color: #fff;
+    background: #fff;
+    color: var(--bleu);
     font-family: Arista, Arial, sans-serif;
     font-weight: 700;
     letter-spacing: .08em;
 }
 
 .profil-rond:hover {
-    background: var(--bleu-fonce);
+    background: #fff;
+    color: var(--bleu-fonce);
+}
+
+.profil-lien {
+    padding: 8px 12px;
+    border-radius: 20px;
+    background: #fff;
+    color: var(--texte);
+    font-family: Arista, Arial, sans-serif;
+    letter-spacing: .06em;
+}
+
+.profil-lien:hover {
+    color: var(--bleu);
+}
+
+.deconnexion-lien {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    margin-left: 2px;
+    border-radius: 50%;
+    background: #fff;
+}
+
+.deconnexion-lien img {
+    width: 24px;
+    height: 24px;
 }
 
 .conteneur {
@@ -149,18 +178,19 @@ input:focus, textarea:focus {
     padding: 11px 15px;
     border-radius: 24px;
     font-size: 1.05rem;
+    background: #fff;
 }
 
 .menu a:hover,
 .menu a.actif {
-    background: var(--bleu-clair);
+    background: #fff;
     color: var(--bleu);
 }
 
 .carte {
     margin-bottom: 15px;
     padding: 15px 18px;
-    background: #c2c2c2;
+    background: #fff;
     border: 1px solid var(--bordure);
     border-radius: 12px;
 }
@@ -247,10 +277,6 @@ input:focus, textarea:focus {
 .logo-touite {
     width: 38px;
     height: 38px;
-}
-
-.logo-autre {
-    filter: hue-rotate(var(--logo-teinte)) saturate(1.25);
 }
 
 .auteur:hover,
@@ -343,6 +369,28 @@ input:focus, textarea:focus {
     margin-bottom: 0;
 }
 
+.statistiques-profil {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 10px 0 8px;
+    color: var(--gris);
+    font-size: .9rem;
+}
+
+.deconnexion-profil {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--bleu);
+    font-size: .9rem;
+}
+
+.deconnexion-profil img {
+    width: 22px;
+    height: 22px;
+}
+
 .pied {
     padding: 18px;
     text-align: center;
@@ -395,7 +443,7 @@ input:focus, textarea:focus {
     color: var(--rouge);
 }
 
-/* Réactions purement visuelles tant que LikeAction n'est pas implémentée. */
+/* Réactions persistées par LikeAction et colorées selon l’évaluation courante. */
 .reactions {
     display: inline-flex;
     align-items: center;
@@ -446,6 +494,46 @@ input:focus, textarea:focus {
     min-width: 1.2em;
     text-align: center;
 }
+
+.resultat-tag,
+.resultat-utilisateur {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.resultats-utilisateurs h2 {
+    margin-top: 0;
+}
+
+.resultat-utilisateur {
+    justify-content: flex-start;
+    padding: 8px 0;
+    border-top: 1px solid var(--bordure);
+}
+
+.resultat-utilisateur .logo-touite {
+    flex: 0 0 auto;
+}
+
+.resultat-utilisateur .suivre-form {
+    margin-left: auto;
+}
+
+.logo-admin {
+    filter: grayscale(1) brightness(0);
+}
+
+.logo-rose { filter: hue-rotate(285deg) saturate(1.4); }
+.logo-rouge { filter: hue-rotate(325deg) saturate(1.7); }
+.logo-orange { filter: hue-rotate(10deg) saturate(1.6); }
+.logo-jaune { filter: hue-rotate(55deg) saturate(1.5); }
+.logo-vert-clair { filter: hue-rotate(95deg) saturate(1.35); }
+.logo-vert-fonce { filter: hue-rotate(125deg) saturate(1.5) brightness(.75); }
+.logo-bleu-fonce { filter: hue-rotate(185deg) saturate(1.6) brightness(.75); }
+.logo-violet { filter: hue-rotate(245deg) saturate(1.45); }
+.logo-marron { filter: hue-rotate(25deg) saturate(1.4) brightness(.65); }
 
 /* Classes conservées pour la maquette statique. */
 .logo_tt {

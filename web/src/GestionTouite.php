@@ -24,7 +24,7 @@ class GestionTouite
     public function getTouiteParId(int $idTouite): ?array
     {
         $sql = 'SELECT t.idTouite, t.texteTouite, t.datePub, t.nbEval,
-                       u.idUtil, u.nomUtil, u.prenomUtil,
+                       u.idUtil, u.nomUtil, u.prenomUtil, u.roleUtil,
                        i.idImage, i.descImage, i.cheminImage
                 FROM touite t
                 JOIN utilisateur u ON u.idUtil = t.idUtil
@@ -44,11 +44,13 @@ class GestionTouite
     public function getTouitesParLibelleTag(string $libelleTag): array
     {
         $sql = 'SELECT t.idTouite, t.texteTouite, t.datePub, t.nbEval,
-                       u.idUtil, u.nomUtil, u.prenomUtil
+                       u.idUtil, u.nomUtil, u.prenomUtil, u.roleUtil,
+                       i.cheminImage, i.descImage
                 FROM touite t
                 JOIN utilisateur u ON u.idUtil = t.idUtil
                 JOIN touitetag tt ON tt.idTouite = t.idTouite
                 JOIN tag tg ON tg.idTag = tt.idTag
+                LEFT JOIN image i ON i.idImage = t.idImage
                 WHERE LOWER(tg.libelleTag) = LOWER(:libelleTag)
                 ORDER BY t.datePub DESC';
         $stmt = $this->pdo->prepare($sql);
@@ -58,7 +60,18 @@ class GestionTouite
 
     public function getUtilisateurById(int $idUtil): ?array
     {
-        $stmt = $this->pdo->prepare('SELECT idUtil, nomUtil, prenomUtil, emailUtil, roleUtil, nbTouites FROM utilisateur WHERE idUtil = :idUtil');
+        $stmt = $this->pdo->prepare(
+            'SELECT u.idUtil, u.nomUtil, u.prenomUtil, u.emailUtil, u.roleUtil, u.nbTouites,
+                    (SELECT COUNT(*) FROM touite t0 WHERE t0.idUtil = u.idUtil) AS totalTouites,
+                    (SELECT COUNT(*)
+                     FROM evaluation e
+                     JOIN touite t1 ON t1.idTouite = e.idTouite
+                     WHERE t1.idUtil = u.idUtil AND e.valeur = 1) AS totalLikes,
+                    (SELECT COUNT(*) FROM suivre s WHERE s.idSuivi = u.idUtil) AS nbAbonnes,
+                    (SELECT COUNT(*) FROM suivre s WHERE s.idSuiveur = u.idUtil) AS nbAbonnements
+             FROM utilisateur u
+             WHERE u.idUtil = :idUtil'
+        );
         $stmt->execute([':idUtil' => $idUtil]);
         $utilisateur = $stmt->fetch(PDO::FETCH_ASSOC);
         return $utilisateur === false ? null : $utilisateur;
@@ -82,9 +95,15 @@ class GestionTouite
                 $image->execute([':description' => 'Image associée à un touite', ':chemin' => $cheminImage]);
                 $idImage = (int) $this->pdo->lastInsertId();
             }
-            $sql = 'INSERT INTO touite (texteTouite, idUtil, idImage) VALUES (:texte, :idUtil, :idImage)';
+            $sql = 'INSERT INTO touite (texteTouite, datePub, idUtil, idImage)
+                    VALUES (:texte, :datePub, :idUtil, :idImage)';
             $stmt = $this->pdo->prepare($sql);
             $stmt->bindValue(':texte', $texte, PDO::PARAM_STR);
+            $stmt->bindValue(
+                ':datePub',
+                (new \DateTimeImmutable('now', new \DateTimeZone('Europe/Paris')))->format('Y-m-d H:i:s'),
+                PDO::PARAM_STR
+            );
             $stmt->bindValue(':idUtil', $idUtil, PDO::PARAM_INT);
             $idImage === null ? $stmt->bindValue(':idImage', null, PDO::PARAM_NULL) : $stmt->bindValue(':idImage', $idImage, PDO::PARAM_INT);
             $stmt->execute();
@@ -194,7 +213,7 @@ class GestionTouite
     private function listeTouites(string $where, array $params = []): array
     {
         $sql = 'SELECT t.idTouite, t.texteTouite, t.datePub, t.nbEval,
-                       u.idUtil, u.nomUtil, u.prenomUtil,
+                       u.idUtil, u.nomUtil, u.prenomUtil, u.roleUtil,
                        i.cheminImage
                 FROM touite t
                 JOIN utilisateur u ON u.idUtil = t.idUtil
@@ -202,6 +221,28 @@ class GestionTouite
                 ' . $where . ' ORDER BY t.datePub DESC';
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /** Recherche textuelle générale des touites, avec requête préparée. */
+    public function rechercherTouites(string $mot): array
+    {
+        return $this->listeTouites(
+            'WHERE t.texteTouite LIKE :mot',
+            [':mot' => '%' . $mot . '%']
+        );
+    }
+
+    /** Recherche d’utilisateurs pour les requêtes préfixées par @. */
+    public function rechercherUtilisateurs(string $mot): array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT idUtil, nomUtil, prenomUtil, roleUtil
+             FROM utilisateur
+             WHERE nomUtil LIKE :mot OR prenomUtil LIKE :mot
+             ORDER BY prenomUtil ASC, nomUtil ASC'
+        );
+        $stmt->execute([':mot' => '%' . $mot . '%']);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

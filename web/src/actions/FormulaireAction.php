@@ -86,7 +86,7 @@ class FormulaireAction extends Action
             . '<label class="bouton-image" for="image">Ajouter une image'
             . '<input id="image" type="file" name="image" accept="image/jpeg,image/png,image/gif,image/webp">'
             . '</label><button class="bouton" type="submit">Touiter</button>'
-            . '</div><img id="apercu-image-formulaire" class="apercu-image" alt="Aperçu de l’image sélectionnée" hidden>'
+            . '</div><img id="apercu-image-formulaire" class="apercu-image" alt="" hidden>'
             . '</form></section>'
             . '<script>document.getElementById("image")?.addEventListener("change", function () {'
             . 'const apercu = document.getElementById("apercu-image-formulaire");'

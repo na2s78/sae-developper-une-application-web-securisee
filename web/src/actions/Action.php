@@ -7,6 +7,10 @@ abstract class Action
 {
     protected PDO $pdo;
     private array $teintesLogo = [];
+    private const COULEURS_LOGO = [
+        'rose', 'rouge', 'orange', 'jaune', 'vert-clair',
+        'vert-fonce', 'bleu-fonce', 'violet', 'marron',
+    ];
 
     public function __construct(PDO $pdo)
     {
@@ -62,26 +66,33 @@ abstract class Action
         if ($dernierEspace !== false) {
             $extrait = mb_substr($extrait, 0, $dernierEspace);
         }
-        return $extrait . '…';
+        return $extrait . '...';
     }
 
-    /** Le logo personnel reste bleu, les autres reçoivent une teinte par page. */
-    protected function logoAttribut(int $idUtil): string
+    /** Le logo personnel reste bleu, les autres reçoivent une couleur de la palette. */
+    protected function logoAttribut(int $idUtil, int $roleUtil = 1): string
     {
         $idConnecte = isset($_SESSION['idUtil']) ? (int) $_SESSION['idUtil'] : 0;
+        if ($roleUtil === 100) {
+            return 'class="logo-touite logo-admin"';
+        }
         if ($idConnecte === $idUtil) {
             return 'class="logo-touite"';
         }
         if (!isset($this->teintesLogo[$idUtil])) {
-            $this->teintesLogo[$idUtil] = random_int(25, 335);
+            $this->teintesLogo[$idUtil] = self::COULEURS_LOGO[random_int(0, count(self::COULEURS_LOGO) - 1)];
         }
-        return 'class="logo-touite logo-autre" style="--logo-teinte:'
-            . $this->teintesLogo[$idUtil] . 'deg"';
+        return 'class="logo-touite logo-autre logo-' . $this->teintesLogo[$idUtil] . '"';
+    }
+
+    protected function mentionAuteur(int $roleUtil): string
+    {
+        return $roleUtil === 100 ? ' - Admin' : '';
     }
 
     /**
      * Affiche les boutons like/dislike et le score. La note existante détermine
-     * l'état visuel du bouton. LikeAction maintient nbEval = nombre de likes.
+     * l'état visuel du bouton. LikeAction maintient nbEval comme score net.
      */
     protected function reactions(int $idTouite, int $score): string
     {

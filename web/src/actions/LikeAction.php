@@ -49,6 +49,8 @@ final class LikeAction extends Action
             );
             $stmt->execute([':idUtil' => $idUtil, ':idTouite' => $idTouite]);
             $noteActuelle = $stmt->fetchColumn();
+            // nbEval est le score net : un like vaut +1 et un dislike vaut -1.
+            $variationScore = 0;
 
             if ($noteActuelle === false) {
                 $stmt = $this->pdo->prepare(
@@ -60,12 +62,14 @@ final class LikeAction extends Action
                     ':idTouite' => $idTouite,
                     ':valeur' => $valeur,
                 ]);
+                $variationScore = $valeur;
             } elseif ((int) $noteActuelle === $valeur) {
                 // Cliquer une seconde fois sur le même bouton retire la note.
                 $stmt = $this->pdo->prepare(
                     'DELETE FROM evaluation WHERE idUtil = :idUtil AND idTouite = :idTouite'
                 );
                 $stmt->execute([':idUtil' => $idUtil, ':idTouite' => $idTouite]);
+                $variationScore = -$valeur;
             } else {
                 // Le clic sur l'autre bouton remplace la note précédente.
                 $stmt = $this->pdo->prepare(
@@ -77,17 +81,20 @@ final class LikeAction extends Action
                     ':idUtil' => $idUtil,
                     ':idTouite' => $idTouite,
                 ]);
+                // Remplacer une note par son opposée modifie le score de 2.
+                $variationScore = $valeur * 2;
             }
 
-            // Le modèle décrit nbEval comme le nombre de likes :
-            // un dislike (-1) n'est pas soustrait du compteur.
+            // Le plancher à zéro empêche un score négatif.
             $stmt = $this->pdo->prepare(
                 'UPDATE touite
-                 SET nbEval = (SELECT COUNT(*) FROM evaluation
-                               WHERE idTouite = :idTouite AND valeur = 1)
-                 WHERE idTouite = :idTouite2'
+                 SET nbEval = GREATEST(nbEval + :variationScore, 0)
+                 WHERE idTouite = :idTouite'
             );
-            $stmt->execute([':idTouite' => $idTouite, ':idTouite2' => $idTouite]);
+            $stmt->execute([
+                ':variationScore' => $variationScore,
+                ':idTouite' => $idTouite,
+            ]);
             $this->pdo->commit();
         } catch (Throwable $exception) {
             if ($this->pdo->inTransaction()) {
