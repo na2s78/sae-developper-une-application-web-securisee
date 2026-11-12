@@ -97,4 +97,39 @@ final class LikeAction extends Action
         }
 
         $this->redirect($this->urlRetour($idTouite));
-    }}
+    }
+
+    /** Valide une URL de retour interne, sans accepter de redirection externe. */
+    private function urlRetour(?int $idTouite): string
+    {
+        $candidat = trim((string) ($_POST['retour'] ?? ''));
+        if ($candidat !== '' && preg_match('/[\r\n]/', $candidat) !== 1) {
+            if ($candidat[0] === '?'
+                && preg_match('/^\?action=[a-z]+(&[a-zA-Z0-9_=%+.,-]*)?$/', $candidat) === 1) {
+                return $candidat;
+            }
+
+            $parts = parse_url($candidat);
+            if ($parts !== false) {
+                $hostValide = !isset($parts['host']);
+                if (isset($parts['host'])) {
+                    $host = $parts['host'] . (isset($parts['port']) ? ':' . $parts['port'] : '');
+                    $hostValide = hash_equals((string) ($_SERVER['HTTP_HOST'] ?? ''), $host);
+                }
+                $path = (string) ($parts['path'] ?? '');
+                if ($hostValide
+                    && $path !== ''
+                    && $path[0] === '/'
+                    && !str_starts_with($path, '//')
+                    && !str_contains($path, '..')
+                    && !str_contains($path, '\\')
+                    && stripos($path, '%2f') === false
+                    && stripos($path, '%5c') === false) {
+                    return $path . (isset($parts['query']) ? '?' . $parts['query'] : '');
+                }
+            }
+        }
+
+        return $idTouite !== null ? '?action=detail&id=' . $idTouite : '?action=home';
+    }
+}
