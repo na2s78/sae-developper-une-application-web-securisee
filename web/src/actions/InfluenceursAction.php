@@ -14,7 +14,6 @@ class InfluenceursAction extends Action
 
         $gestion = new GestionTouite($this->pdo);
 
-        // Le rôle est relu en base : on ne se fie pas à ce qui vient du navigateur
         $utilisateur = $gestion->getUtilisateurById((int) $_SESSION['idUtil']);
         if ($utilisateur === null || (int) $utilisateur['roleUtil'] !== 100) {
             http_response_code(403);
