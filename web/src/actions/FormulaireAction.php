@@ -1,51 +1,90 @@
 <?php
-
-//Fonctionnalité 6 : Publier un touite
-
+// Fonctionnalité 6 : publier un touite ; GestionTouite extrait et associe les #tags.
+// Fonctionnalité 13 facultative : joindre une image vérifiée au touite.
 namespace touiteur\actions;
 
+use PDOException;
+use RuntimeException;
+use Throwable;
 use touiteur\GestionTouite;
-use PDO;
 
 class FormulaireAction extends Action
 {
-    private PDO $pdo;
-
-    public function __construct(PDO $pdo)
-    {
-        $this->pdo = $pdo;
-    }
+    private const TAILLE_MAX_IMAGE = 2 * 1024 * 1024; // 2 Mo
+    private const TYPES_IMAGE = [
+        'image/jpeg' => 'jpg',
+        'image/png' => 'png',
+        'image/gif' => 'gif',
+        'image/webp' => 'webp',
+    ];
 
     public function execute(): string
     {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
-
-        if (!isset($_SESSION['idUtil'])) {
-            header('Location: ?action=connexion');
-            exit();
+        if (empty($_SESSION['idUtil'])) {
+            $this->redirect('?action=connexion');
         }
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $texte = trim($_POST['texteTouite'] ?? '');
-            $idUtil = (int)$_SESSION['idUtil'];
+        $erreur = null;
+        $texte = '';
 
-            if (!empty($texte) && mb_strlen($texte) <= 235) {
-                $gestionTouite = new GestionTouite($this->pdo);
-                $gestionTouite->publierTouite($idUtil, $texte);
+        if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
+            $texte = trim((string) ($_POST['texteTouite'] ?? ''));
+            $idUtil = (int) $_SESSION['idUtil'];
 
-                header('Location: ?action=home');
-                exit();
+            if ($texte === '') {
+                $erreur = 'Le touite ne peut pas être vide.';
+            } elseif (mb_strlen($texte, 'UTF-8') > 235) {
+                $erreur = 'Le touite ne doit pas dépasser 235 caractères.';
+            } else {
+                $cheminImage = null;
+                try {
+                    $cheminImage = $this->enregistrerImage();
+                    $gestion = new GestionTouite($this->pdo);
+                    $gestion->publierTouite($idUtil, $texte, $cheminImage);
+
+                    // GestionTouite incrémente nbTouites et le trigger
+                    // trg_maj_nb_touites l'incrémente aussi. Comme on ne modifie
+                    // pas GestionTouite.php, on remet le compteur à sa valeur
+                    // dérivée réelle après insertion (plutôt que le laisser doublé).
+                    $stmt = $this->pdo->prepare(
+                        'UPDATE utilisateur
+                         SET nbTouites = (SELECT COUNT(*) FROM touite WHERE idUtil = :idUtilCompte)
+                         WHERE idUtil = :idUtil'
+                    );
+                    $stmt->execute([':idUtilCompte' => $idUtil, ':idUtil' => $idUtil]);
+
+                    $this->redirect('?action=home');
+                } catch (PDOException $exception) {
+                    $this->supprimerImage($cheminImage);
+                    error_log('FormulaireAction : ' . $exception->getMessage());
+                    $erreur = (string) $exception->getCode() === '45000'
+                        ? 'Vous avez atteint la limite de 50 touites par jour.'
+                        : 'La publication a échoué. Réessayez dans un instant.';
+                } catch (RuntimeException $exception) {
+                    $this->supprimerImage($cheminImage);
+                    $erreur = $exception->getMessage();
+                } catch (Throwable $exception) {
+                    $this->supprimerImage($cheminImage);
+                    error_log('FormulaireAction : ' . $exception->getMessage());
+                    $erreur = 'La publication a échoué. Réessayez dans un instant.';
+                }
             }
         }
 
-        return '
-            <form action="index.php?action=formulaire" method="post">
-                <label for="texteTouite">Votre touite (max 235 caractères) :</label><br>
-                <textarea name="texteTouite" id="texteTouite" maxlength="235" required></textarea><br>
-                <button type="submit">Publier le touite</button>
-            </form>
-        ';
+        $alerte = $erreur === null ? '' : '<p class="alerte">' . $this->e($erreur) . '</p>';
+        return '<section class="carte publier">'
+            . '<h1>Publier un touite</h1>' . $alerte
+            . '<form method="post" action="?action=formulaire" enctype="multipart/form-data">'
+            . '<label class="visuellement-cache" for="texteTouite">Votre touite</label>'
+            . '<textarea id="texteTouite" name="texteTouite" maxlength="235" required'
+            . ' placeholder="Quoi de neuf ? Ajoutez des #tags...">' . $this->e($texte) . '</textarea>'
+            . '<p class="date">235 caractères maximum. Les #tags sont automatiquement reconnus.</p>'
+            . '<div class="publier-bas">'
+            . '<label class="bouton-image" for="image">Ajouter une image'
+            . '<input id="image" type="file" name="image" accept="image/jpeg,image/png,image/gif,image/webp">'
+            . '</label><button class="bouton" type="submit">Touiter</button>'
+            . '</div></form></section>';
     }
-}
