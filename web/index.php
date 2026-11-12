@@ -13,6 +13,8 @@ use touiteur\actions\HomeAction;
 use touiteur\actions\LikeAction;
 use touiteur\actions\TagAction;
 use touiteur\actions\UserAction;
+use touiteur\actions\InfluenceursAction;
+
 
 session_start();
 
@@ -38,6 +40,7 @@ $dispatcher->addRoute('default', HomeAction::class)
     ->addRoute('follow', FollowAction::class)
     ->addRoute('like', LikeAction::class)
     ->addRoute('connexion', CompteConnex::class)
-    ->addRoute('deconnexion', CompteConnex::class);
+    ->addRoute('deconnexion', CompteConnex::class)
+    ->addRoute('influenceurs', InfluenceursAction::class);
 
 $dispatcher->run();

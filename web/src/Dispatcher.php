@@ -37,9 +37,18 @@ class Dispatcher
 
     private function renderPage(string $html): void
     {
-        // L'habillage est centralisé ici : chaque action ne renvoie que le contenu principal.
         $accueil = in_array($this->action, ['default', 'home'], true) ? ' class="actif"' : '';
         $idUtil = (int) ($_SESSION['idUtil'] ?? 0);
+        // Lien vers les influenceurs, visible pour un administrateur
+        $lienAdmin = '';
+        if ($idUtil > 0) {
+            $connecte = (new GestionTouite($this->pdo))->getUtilisateurById($idUtil);
+            if ($connecte !== null && (int) $connecte['roleUtil'] === 100) {
+                $actifAdmin = $this->action === 'influenceurs' ? ' class="actif"' : '';
+                $lienAdmin = '<a href="?action=influenceurs"' . $actifAdmin . '>Top touiteurs</a>';
+            }
+        }
+
         $profilHeader = '';
         $connexionHeader = '<form class="connexion" method="POST" action="?action=connexion">'
             . '<input type="email" name="mail" placeholder="Email" required>'
@@ -115,6 +124,7 @@ class Dispatcher
         <a href="?action=home"{$accueil}>Accueil</a>
         <a href="?action=mur">Mon mur</a>
         <a href="?action=formulaire">Publier</a>
+        {$lienAdmin}
     </nav>
 
     <main class="fil">

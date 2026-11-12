@@ -245,4 +245,20 @@ class GestionTouite
         $stmt->execute([':mot' => '%' . $mot . '%']);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+
+    // Fonctionnalité 14 : les utilisateurs classés par nombre de suiveurs
+    public function getInfluenceurs(): array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT u.idUtil, u.prenomUtil, u.nomUtil, COUNT(s.idSuiveur) AS nbSuiveurs
+            FROM utilisateur u
+            LEFT JOIN suivre s ON s.idSuivi = u.idUtil
+            GROUP BY u.idUtil, u.prenomUtil, u.nomUtil
+            ORDER BY nbSuiveurs ASC, u.nomUtil ASC'
+        );
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
 }

@@ -12,7 +12,7 @@
     - Kevin et Nassim Partie globale BD :
 
         - Conception de la base tables et relations
-        - Script SQL de creation et triggers Oracle
+        - Script SQL de creation et triggers
         - Donnees de test et rapport   
 
     - Romain Adnan et Gabriel Partie gloable PHP
@@ -29,6 +29,7 @@
         - Dossier conf avec db.ini.exemple et la protection avec .htaccess
         - Ajout de l'autoloader
         - Mise en page
+        - 14. Influenceurs (page Top touiteurs)
 
     - Romain :
         - Création et peaufinage d'un design cohérent avec le thème (partagé sur la maquette de Nassim)
