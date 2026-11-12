@@ -50,6 +50,7 @@
 
 
     - Kevin (kevinpasK) :
-
-
+        -création de la base de données 
+        -9. Mur (Avoir un mur selon les abonnements (personnes ou tags présents))
+    
     - Adnan (Adnan Hamed Omer) :
