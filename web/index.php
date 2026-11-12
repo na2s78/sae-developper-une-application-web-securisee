@@ -14,6 +14,7 @@ use touiteur\actions\LikeAction;
 use touiteur\actions\TagAction;
 use touiteur\actions\UserAction;
 use touiteur\actions\InfluenceursAction;
+use touiteur\actions\MurAction;
 
 
 session_start();
@@ -31,7 +32,7 @@ try {
 $dispatcher = new Dispatcher($pdo);
 $dispatcher->addRoute('default', HomeAction::class)
     ->addRoute('home', HomeAction::class)
-    ->addRoute('mur', HomeAction::class)
+    ->addRoute('mur', MurAction::class)
     ->addRoute('detail', DetailAction::class)
     ->addRoute('user', UserAction::class)
     ->addRoute('profil', UserAction::class)

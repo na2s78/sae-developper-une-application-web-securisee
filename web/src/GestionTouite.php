@@ -209,6 +209,25 @@ class GestionTouite
         return $tag === null ? null : (int) $tag['idTag'];
     }
 
+    public function getMurUtilisateur(int $idUtil): array
+    {
+        $sql = 'SELECT t.idTouite, t.texteTouite, t.datePub, t.nbEval,
+                       u.idUtil, u.nomUtil, u.prenomUtil, u.roleUtil,
+                       i.cheminImage
+                FROM touite t
+                JOIN utilisateur u ON u.idUtil = t.idUtil
+                LEFT JOIN image i ON i.idImage = t.idImage
+                WHERE t.idUtil IN (SELECT s.idSuivi FROM suivre s WHERE s.idSuiveur = :idSuiveur)
+                OR t.idTouite IN (SELECT tt.idTouite
+                                  FROM touitetag tt
+                                  JOIN abonnementtag abo ON abo.idTag = tt.idTag
+                                  WHERE abo.idUtil = :idAbonne)
+                ORDER BY t.datePub DESC';
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':idSuiveur' => $idUtil, ':idAbonne' => $idUtil]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     private function listeTouites(string $where, array $params = []): array
     {
         $sql = 'SELECT t.idTouite, t.texteTouite, t.datePub, t.nbEval,

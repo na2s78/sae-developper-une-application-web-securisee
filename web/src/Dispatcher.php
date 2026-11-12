@@ -38,6 +38,7 @@ class Dispatcher
     private function renderPage(string $html): void
     {
         $accueil = in_array($this->action, ['default', 'home'], true) ? ' class="actif"' : '';
+        $actifMur = $this->action === 'mur' ? ' class="actif"' : '';
         $idUtil = (int) ($_SESSION['idUtil'] ?? 0);
         $lienAdmin = '';
         if ($idUtil > 0) {
@@ -121,7 +122,7 @@ class Dispatcher
 
     <nav class="menu">
         <a href="?action=home"{$accueil}>Accueil</a>
-        <a href="?action=mur">Mon mur</a>
+        <a href="?action=mur"{$actifMur}>Mon mur</a>
         <a href="?action=formulaire">Publier</a>
         {$lienAdmin}
     </nav>
