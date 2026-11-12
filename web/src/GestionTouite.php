@@ -171,6 +171,20 @@ class GestionTouite
         $stmt->execute([':idUtil' => $idUtil, ':idTag' => $idTag]);
     }
 
+    /** Retourne les tags suivis, triés par libellé, pour la colonne latérale. */
+    public function getTagsSuivis(int $idUtil): array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT tg.idTag, tg.libelleTag
+             FROM abonnementtag abo
+             JOIN tag tg ON tg.idTag = abo.idTag
+             WHERE abo.idUtil = :idUtil
+             ORDER BY tg.libelleTag ASC'
+        );
+        $stmt->execute([':idUtil' => $idUtil]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function idTagParLibelle(string $libelle): ?int
     {
         $tag = $this->getTagByLibelle(ltrim($libelle, '#'));

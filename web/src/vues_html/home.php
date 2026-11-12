@@ -13,8 +13,22 @@ $rechercheTag = $rechercheTag ?? false;
         <label class="visuellement-cache" for="texteTouite">Votre touite</label>
         <textarea id="texteTouite" name="texteTouite" maxlength="235" placeholder="Quoi de neuf ? Ajoutez des #tags..." required></textarea>
         <div class="publier-bas"><label class="bouton-image" for="image">Ajouter une image<input id="image" type="file" name="image" accept="image/jpeg,image/png,image/gif,image/webp"></label><button class="bouton" type="submit">Touiter</button></div>
+        <img id="apercu-image-home" class="apercu-image" alt="Aperçu de l’image sélectionnée" hidden>
     </form>
 </section>
+<script>
+document.getElementById('image')?.addEventListener('change', function () {
+    const apercu = document.getElementById('apercu-image-home');
+    const fichier = this.files && this.files[0];
+    if (!fichier || !fichier.type.startsWith('image/')) {
+        apercu.hidden = true;
+        apercu.removeAttribute('src');
+        return;
+    }
+    apercu.src = URL.createObjectURL(fichier);
+    apercu.hidden = false;
+});
+</script>
 <?php if ($rechercheTag && $touites === [] && $message === null): ?>
     <section class="carte">
         <p>Aucun touite avec ce tag.</p>

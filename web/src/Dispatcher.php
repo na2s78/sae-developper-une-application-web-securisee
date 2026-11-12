@@ -39,6 +39,47 @@ class Dispatcher
     {
         // L'habillage est centralisé ici : chaque action ne renvoie que le contenu principal.
         $accueil = in_array($this->action, ['default', 'home'], true) ? ' class="actif"' : '';
+        $idUtil = (int) ($_SESSION['idUtil'] ?? 0);
+        $profilHeader = '';
+        $connexionHeader = '<form class="connexion" method="POST" action="?action=connexion">'
+            . '<input type="email" name="mail" placeholder="Email" required>'
+            . '<input type="password" name="pw" placeholder="Mot de passe" required>'
+            . '<button type="submit" class="bouton">Connexion</button></form>';
+        if ($idUtil > 0) {
+            $prenom = (string) ($_SESSION['prenomUtil'] ?? '');
+            $nom = (string) ($_SESSION['nomUtil'] ?? '');
+            $initiales = htmlspecialchars(
+                mb_strtoupper(mb_substr($prenom, 0, 1) . mb_substr($nom, 0, 1)),
+                ENT_QUOTES | ENT_SUBSTITUTE,
+                'UTF-8'
+            );
+            $profilHeader = '<a class="profil-rond" href="?action=profil" title="Mon profil" aria-label="Mon profil">'
+                . $initiales . '</a>';
+            $connexionHeader = '';
+        }
+        $tagsSuivisHtml = '<div class="carte tags-suivis"><h3>Mes tags suivis</h3>';
+        if ($idUtil <= 0) {
+            $tagsSuivisHtml .= '<p class="date">Connectez-vous pour voir vos tags suivis.</p>';
+        } else {
+            $tagsSuivis = (new GestionTouite($this->pdo))->getTagsSuivis($idUtil);
+            if ($tagsSuivis === []) {
+                $tagsSuivisHtml .= '<p class="date">Aucun tag suivi.</p>';
+            } else {
+                $tagsSuivisHtml .= '<ul class="liste-tags">';
+                foreach ($tagsSuivis as $tag) {
+                    $libelle = htmlspecialchars((string) $tag['libelleTag'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+                    $url = rawurlencode((string) $tag['libelleTag']);
+                    $retour = htmlspecialchars($_SERVER['REQUEST_URI'] ?? '?action=home', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+                    $tagsSuivisHtml .= '<li><a class="tag" href="?action=tag&amp;tag=' . $url . '">#' . $libelle . '</a>'
+                        . '<form method="post" action="?action=follow" class="desabonner-tag">'
+                        . '<input type="hidden" name="type" value="tag"><input type="hidden" name="idTag" value="' . (int) $tag['idTag'] . '">'
+                        . '<input type="hidden" name="mode" value="desabonner"><input type="hidden" name="retour" value="' . $retour . '">'
+                        . '<button type="submit" title="Ne plus suivre ce tag" aria-label="Ne plus suivre ce tag">×</button></form></li>';
+                }
+                $tagsSuivisHtml .= '</ul>';
+            }
+        }
+        $tagsSuivisHtml .= '</div>';
 
         echo <<<HTML
 <!DOCTYPE html>
@@ -59,14 +100,11 @@ class Dispatcher
     <form class="recherche" method="GET" action="index.php">
         <input type="hidden" name="action" value="tag">
         <label class="visuellement-cache" for="recherche-tag">Rechercher un tag</label>
-        <input id="recherche-tag" name="tag" type="search" maxlength="30" placeholder="#tag">
+        <input id="recherche-tag" name="tag" type="search" maxlength="30" placeholder="Rechercher sur Touiteur...">
     </form>
 
-    <form class="connexion" method="POST" action="?action=connexion">
-        <input type="email" name="mail" placeholder="Email" required>
-        <input type="password" name="pw" placeholder="Mot de passe" required>
-        <button type="submit" class="bouton">Connexion</button>
-    </form>
+    {$connexionHeader}
+    {$profilHeader}
 </header>
 
 <div class="conteneur">
@@ -92,6 +130,7 @@ class Dispatcher
                 <button type="submit" class="bouton">OK</button>
             </form>
         </div>
+        {$tagsSuivisHtml}
     </aside>
 
 </div>

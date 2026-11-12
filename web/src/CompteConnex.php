@@ -24,6 +24,13 @@ class CompteConnex
             exit;
         }
 
+        // Une session valide remplace l’écran de connexion. L’utilisateur
+        // doit d’abord se déconnecter pour ouvrir une autre session.
+        if (!empty($_SESSION['idUtil'])) {
+            header('Location: ?action=home', true, 303);
+            exit;
+        }
+
         $erreur = null;
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $email = trim((string) ($_POST['mail'] ?? ''));
