@@ -88,3 +88,46 @@ class FormulaireAction extends Action
             . '</label><button class="bouton" type="submit">Touiter</button>'
             . '</div></form></section>';
     }
+
+    /** Enregistre une image téléversée et renvoie son chemin relatif, ou null. */
+    private function enregistrerImage(): ?string
+    {
+        if (!isset($_FILES['image']) || !is_array($_FILES['image'])) {
+            return null;
+        }
+        $fichier = $_FILES['image'];
+        if (!isset($fichier['error']) || $fichier['error'] === UPLOAD_ERR_NO_FILE) {
+            return null;
+        }
+        if ($fichier['error'] !== UPLOAD_ERR_OK) {
+            throw new RuntimeException('Le téléversement de l’image a échoué.');
+        }
+        if (!is_uploaded_file((string) $fichier['tmp_name'])) {
+            throw new RuntimeException('Fichier image invalide.');
+        }
+        if ((int) $fichier['size'] <= 0 || (int) $fichier['size'] > self::TAILLE_MAX_IMAGE) {
+            throw new RuntimeException('L’image ne doit pas dépasser 2 Mo.');
+        }
+
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        if ($finfo === false) {
+            throw new RuntimeException('Impossible de vérifier le format de l’image.');
+        }
+        $mime = finfo_file($finfo, (string) $fichier['tmp_name']);
+        finfo_close($finfo);
+        if (!is_string($mime) || !isset(self::TYPES_IMAGE[$mime])
+            || @getimagesize((string) $fichier['tmp_name']) === false) {
+            throw new RuntimeException('Format accepté : image JPEG, PNG, GIF ou WebP valide.');
+        }
+
+        $dossier = dirname(__DIR__, 2) . '/ressources/images_upload';
+        if (!is_dir($dossier) && !mkdir($dossier, 0755, true) && !is_dir($dossier)) {
+            throw new RuntimeException('Impossible d’enregistrer l’image.');
+        }
+        $nom = bin2hex(random_bytes(16)) . '.' . self::TYPES_IMAGE[$mime];
+        if (!move_uploaded_file((string) $fichier['tmp_name'], $dossier . '/' . $nom)) {
+            throw new RuntimeException('Impossible d’enregistrer l’image.');
+        }
+        @chmod($dossier . '/' . $nom, 0644);
+        return 'ressources/images_upload/' . $nom;
+    }}
