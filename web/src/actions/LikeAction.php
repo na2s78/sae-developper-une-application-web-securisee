@@ -1,8 +1,9 @@
 <?php
-// Fonctionnalité 7 : évaluer un touite.
+// Fonctionnalité 7 : noter un touite avec un like (1) ou un dislike (-1).
+// La table evaluation garantit une seule note par utilisateur et par touite.
 namespace touiteur\actions;
 
-use PDO;
+use Throwable;
 
 final class LikeAction extends Action
 {
@@ -12,11 +13,12 @@ final class LikeAction extends Action
             session_start();
         }
 
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->redirect();
+        if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
+            $this->redirect('?action=home');
         }
 
-        if (!isset($_SESSION['idUtil'])) {
+        $idUtil = (int) ($_SESSION['idUtil'] ?? 0);
+        if ($idUtil <= 0) {
             $this->redirect('?action=connexion');
         }
 
@@ -26,40 +28,73 @@ final class LikeAction extends Action
         $valeur = filter_input(INPUT_POST, 'valeur', FILTER_VALIDATE_INT);
 
         if ($idTouite === false || $idTouite === null || !in_array($valeur, [1, -1], true)) {
-            $this->redirect();
+            $this->redirect($this->urlRetour(null));
         }
 
-        // La valeur est blanche-listée et l'identifiant est lié : aucune concaténation SQL.
-        $sql = 'UPDATE Touite
-                SET nbEval = CASE WHEN nbEval + ? < 0 THEN 0 ELSE nbEval + ? END
-                WHERE idTouite = ?';
-        $statement = $this->pdo->prepare($sql);
-        $statement->execute([$valeur, $valeur, $idTouite]);
+        try {
+            $this->pdo->beginTransaction();
 
-        $this->redirect();
-    }
-
-    private function redirect(string $fallback = '?action=home'): void
-    {
-        $target = $fallback;
-        $referer = $_SERVER['HTTP_REFERER'] ?? '';
-
-        if ($referer !== '') {
-            $parts = parse_url($referer);
-            $sameHost = !isset($parts['host']) || $parts['host'] === ($_SERVER['HTTP_HOST'] ?? '');
-            $path = $parts['path'] ?? '';
-            if ($sameHost && $path !== '' && !preg_match('/[\r\n]/', $referer)) {
-                $target = $path;
-                if (isset($parts['query'])) {
-                    $target .= '?' . $parts['query'];
-                }
-                if (isset($parts['fragment'])) {
-                    $target .= '#' . $parts['fragment'];
-                }
+            // Le verrou évite que deux votes simultanés écrasent leur résultat.
+            $verrou = $this->pdo->prepare(
+                'SELECT idTouite FROM touite WHERE idTouite = :idTouite FOR UPDATE'
+            );
+            $verrou->execute([':idTouite' => $idTouite]);
+            if ($verrou->fetchColumn() === false) {
+                $this->pdo->rollBack();
+                $this->redirect('?action=home');
             }
+
+            $stmt = $this->pdo->prepare(
+                'SELECT valeur FROM evaluation WHERE idUtil = :idUtil AND idTouite = :idTouite'
+            );
+            $stmt->execute([':idUtil' => $idUtil, ':idTouite' => $idTouite]);
+            $noteActuelle = $stmt->fetchColumn();
+
+            if ($noteActuelle === false) {
+                $stmt = $this->pdo->prepare(
+                    'INSERT INTO evaluation (idUtil, idTouite, valeur)
+                     VALUES (:idUtil, :idTouite, :valeur)'
+                );
+                $stmt->execute([
+                    ':idUtil' => $idUtil,
+                    ':idTouite' => $idTouite,
+                    ':valeur' => $valeur,
+                ]);
+            } elseif ((int) $noteActuelle === $valeur) {
+                // Cliquer une seconde fois sur le même bouton retire la note.
+                $stmt = $this->pdo->prepare(
+                    'DELETE FROM evaluation WHERE idUtil = :idUtil AND idTouite = :idTouite'
+                );
+                $stmt->execute([':idUtil' => $idUtil, ':idTouite' => $idTouite]);
+            } else {
+                // Le clic sur l'autre bouton remplace la note précédente.
+                $stmt = $this->pdo->prepare(
+                    'UPDATE evaluation SET valeur = :valeur
+                     WHERE idUtil = :idUtil AND idTouite = :idTouite'
+                );
+                $stmt->execute([
+                    ':valeur' => $valeur,
+                    ':idUtil' => $idUtil,
+                    ':idTouite' => $idTouite,
+                ]);
+            }
+
+            // Le modèle décrit nbEval comme le nombre de likes :
+            // un dislike (-1) n'est pas soustrait du compteur.
+            $stmt = $this->pdo->prepare(
+                'UPDATE touite
+                 SET nbEval = (SELECT COUNT(*) FROM evaluation
+                               WHERE idTouite = :idTouite AND valeur = 1)
+                 WHERE idTouite = :idTouite2'
+            );
+            $stmt->execute([':idTouite' => $idTouite, ':idTouite2' => $idTouite]);
+            $this->pdo->commit();
+        } catch (Throwable $exception) {
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
+            error_log('LikeAction : ' . $exception->getMessage());
         }
 
-        header('Location: ' . $target, true, 303);
-        exit;
-    }
-}
+        $this->redirect($this->urlRetour($idTouite));
+    }}
