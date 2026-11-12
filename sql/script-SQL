@@ -44,7 +44,6 @@ create table touite (
   idutil int not null,
   idimage int,
   constraint pk_touite primary key (idtouite),
-  constraint ck_nbeval check (nbeval >= 0),
   constraint fk_touite_util foreign key (idutil) references utilisateur (idutil) on delete cascade,
   constraint fk_touite_image foreign key (idimage) references image (idimage) on delete set null
 ) engine=innodb;

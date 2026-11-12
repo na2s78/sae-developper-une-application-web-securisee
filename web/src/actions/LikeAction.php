@@ -1,5 +1,5 @@
 <?php
-// Fonctionnalité 7 : noter un touite avec un like (1) ou un dislike (-1). On ne va pas en dessous de zéro. Du moins pas encore.
+// Fonctionnalité 7 : noter un touite avec un like (1) ou un dislike (-1). Une seule note par utilisateur
 namespace touiteur\actions;
 
 use Throwable;
@@ -46,7 +46,6 @@ final class LikeAction extends Action
             );
             $stmt->execute([':idUtil' => $idUtil, ':idTouite' => $idTouite]);
             $noteActuelle = $stmt->fetchColumn();
-            $variationScore = 0;
 
             if ($noteActuelle === false) {
                 $stmt = $this->pdo->prepare(
@@ -58,13 +57,11 @@ final class LikeAction extends Action
                     ':idTouite' => $idTouite,
                     ':valeur' => $valeur,
                 ]);
-                $variationScore = $valeur;
             } elseif ((int) $noteActuelle === $valeur) {
                 $stmt = $this->pdo->prepare(
                     'DELETE FROM evaluation WHERE idUtil = :idUtil AND idTouite = :idTouite'
                 );
                 $stmt->execute([':idUtil' => $idUtil, ':idTouite' => $idTouite]);
-                $variationScore = -$valeur;
             } else {
                 $stmt = $this->pdo->prepare(
                     'UPDATE evaluation SET valeur = :valeur
@@ -75,17 +72,17 @@ final class LikeAction extends Action
                     ':idUtil' => $idUtil,
                     ':idTouite' => $idTouite,
                 ]);
-                $variationScore = $valeur * 2;
             }
 
+            // Remplacement du bug des likes et dislike apres test tout fonctionne correctement le score est la somme des notes +1 like -1 disklike
             $stmt = $this->pdo->prepare(
                 'UPDATE touite
-                 SET nbEval = GREATEST(nbEval + :variationScore, 0)
-                 WHERE idTouite = :idTouite'
+                 SET nbEval = (SELECT COALESCE(SUM(valeur), 0) FROM evaluation WHERE idTouite = :idTouite)
+                 WHERE idTouite = :idTouite2'
             );
             $stmt->execute([
-                ':variationScore' => $variationScore,
                 ':idTouite' => $idTouite,
+                ':idTouite2' => $idTouite,
             ]);
             $this->pdo->commit();
         } catch (Throwable $exception) {

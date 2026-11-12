@@ -117,7 +117,7 @@ abstract class Action
         return '<div class="reactions" aria-label="Évaluer ce touite">'
             . $bouton(1, 'reaction-like', 'J’aime')
             . $bouton(-1, 'reaction-dislike', 'Je n’aime pas')
-            . '<span class="score" title="Nombre de likes">' . (int) $score . '</span>'
+            . '<span class="score" title="Score">' . (int) $score . '</span>'
             . '</div>';
     }
 
