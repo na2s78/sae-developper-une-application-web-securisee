@@ -130,4 +130,17 @@ class FormulaireAction extends Action
         }
         @chmod($dossier . '/' . $nom, 0644);
         return 'ressources/images_upload/' . $nom;
-    }}
+    }
+
+    /** Supprime l'image déposée si la publication échoue. */
+    private function supprimerImage(?string $chemin): void
+    {
+        if ($chemin === null || $chemin === '') {
+            return;
+        }
+        $absolu = dirname(__DIR__, 2) . '/' . $chemin;
+        if (is_file($absolu)) {
+            @unlink($absolu);
+        }
+    }
+}
