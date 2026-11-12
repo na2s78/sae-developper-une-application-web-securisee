@@ -52,7 +52,7 @@ class FormulaireAction extends Action
                     );
                     $stmt->execute([':idUtilCompte' => $idUtil, ':idUtil' => $idUtil]);
 
-                    $this->redirect('?action=home');
+                    $this->redirect(($_POST['retour'] ?? '') === 'mur' ? '?action=mur' : '?action=home');
                 } catch (PDOException $exception) {
                     $this->supprimerImage($cheminImage);
                     error_log('FormulaireAction : ' . $exception->getMessage());

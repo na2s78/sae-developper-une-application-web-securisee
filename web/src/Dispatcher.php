@@ -111,7 +111,7 @@ class Dispatcher
     <form class="recherche" method="GET" action="index.php">
         <input type="hidden" name="action" value="tag">
         <label class="visuellement-cache" for="recherche-tag">Rechercher un tag</label>
-        <input id="recherche-tag" name="q" type="search" maxlength="60" placeholder="Rechercher sur Touiteur...">
+        <input id="recherche-tag" name="tag" type="search" maxlength="60" placeholder="Rechercher un #tag...">
     </form>
 
     {$connexionHeader}

@@ -9,7 +9,6 @@
         <article class="carte touite">
             <header class="touite-haut"><img <?= $this->logoAttribut((int) $touite['idUtil'], (int) $touite['roleUtil']) ?> src="ressources/images_css/touiteur_logo.svg" alt=""><time class="date" datetime="<?= $this->e($touite['datePub']) ?>"><?= $this->e($touite['datePub']) ?></time></header>
             <p class="touite-texte"><?= $this->rendreTexte($texteCourt) ?></p>
-            <?php if (!empty($touite['cheminImage'])): ?><img class="touite-image" src="<?= $this->e($touite['cheminImage']) ?>" alt=""><?php endif; ?>
             <footer class="touite-bas"><span class="date">Publié par <?= $this->e($touite['prenomUtil'] . ' ' . $touite['nomUtil']) ?><?= $this->e($this->mentionAuteur((int) $touite['roleUtil'])) ?></span><?= $this->reactions((int) $touite['idTouite'], (int) $touite['nbEval']) ?><a class="lien-detail" href="?action=detail&amp;id=<?= (int) $touite['idTouite'] ?>">Voir le détail →</a></footer>
         </article>
     <?php endforeach; ?>

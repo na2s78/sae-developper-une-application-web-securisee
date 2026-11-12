@@ -242,14 +242,7 @@ class GestionTouite
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /** Recherche textuelle générale des touites, avec requête préparée. */
-    public function rechercherTouites(string $mot): array
-    {
-        return $this->listeTouites(
-            'WHERE t.texteTouite LIKE :mot',
-            [':mot' => '%' . $mot . '%']
-        );
-    }
+
 
     // Fonctionnalité 14 : les utilisateurs classés par nombre de suiveurs
     // nous suivons les consignes mais l'ordre devrait être décroissant logiquement
