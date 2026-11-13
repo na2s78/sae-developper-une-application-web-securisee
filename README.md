@@ -10,6 +10,7 @@
 ## Lien
 
 - Dépôt git : https://github.com/na2s78/sae-developper-une-application-web-securisee
+- Dépôt webetu : https://webetu.iutnc.univ-lorraine.fr/www/e23420u/touiteur/web/
 
 
 ## Installation
