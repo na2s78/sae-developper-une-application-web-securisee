@@ -48,9 +48,10 @@
 
     - Gabriel (RodriguesNetoGab) :
 
-        - Création des classes Action, HomeAction, Dispatcher avec un premier index
+        - Création des premières versions des classes Action, HomeAction, Dispatcher avec un premier index
         - Création de GestionTouite.php qui a été corrigé par Romain par la suite
         - Travail sur les fonctionnalités 1, 2, 4, 5 et 8
+        - Première version de la classe Connexion
         
 
 
