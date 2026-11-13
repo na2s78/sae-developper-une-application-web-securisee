@@ -62,12 +62,22 @@ class Dispatcher
                 ENT_QUOTES | ENT_SUBSTITUTE,
                 'UTF-8'
             );
-            $profilHeader = '<a class="profil-rond" href="?action=profil" title="Mon profil" aria-label="Mon profil">'
+            $profilHeader = '<div class="profil-actions">'
+                . '<img class="oiseau-profil" src="ressources/images_css/touiteur_logo.svg" alt="">'
+                . '<a class="profil-rond" href="?action=profil" title="Mon profil" aria-label="Mon profil">'
                 . $initiales . '</a><a class="profil-lien" href="?action=profil">Mon profil</a>'
                 . '<a class="deconnexion-lien" href="?action=deconnexion" title="Se déconnecter" aria-label="Se déconnecter">'
-                . '<img src="ressources/images_css/log_out.svg" alt=""></a>';
+                . '<img src="ressources/images_css/log_out.svg" alt=""></a></div>';
             $connexionHeader = '';
         }
+        $tagsInfluentsHtml = '<div class="carte tags-influents"><h3>Tags les plus suivis</h3><ul class="liste-tags">';
+        foreach ((new GestionTouite($this->pdo))->getTagsInfluents(4) as $tag) {
+            $libelle = htmlspecialchars((string) $tag['libelleTag'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+            $url = rawurlencode((string) $tag['libelleTag']);
+            $tagsInfluentsHtml .= '<li><a class="tag" href="?action=tag&amp;tag=' . $url . '">#' . $libelle . '</a><span>' . (int) $tag['nbAbonnes'] . '</span></li>';
+        }
+        $tagsInfluentsHtml .= '</ul></div>';
+
         $tagsSuivisHtml = '<div class="carte tags-suivis"><h3>Mes tags suivis</h3>';
         if ($idUtil <= 0) {
             $tagsSuivisHtml .= '<p class="date">Connectez-vous pour voir vos tags suivis.</p>';
@@ -132,6 +142,7 @@ class Dispatcher
     </main>
 
     <aside class="cote">
+        {$tagsInfluentsHtml}
         <div class="carte">
             <h3>S'abonner à un tag</h3>
             <form method="POST" action="?action=follow" class="abonner">

@@ -189,7 +189,6 @@ class GestionTouite
         $stmt->execute([':idUtil' => $idUtil, ':idTag' => $idTag]);
     }
 
-    /** Retourne les tags suivis, triés par libellé à droite */
     public function getTagsSuivis(int $idUtil): array
     {
         $stmt = $this->pdo->prepare(
@@ -200,6 +199,22 @@ class GestionTouite
              ORDER BY tg.libelleTag ASC'
         );
         $stmt->execute([':idUtil' => $idUtil]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getTagsInfluents(int $limite = 4): array
+    {
+        $limite = max(1, min($limite, 20));
+        $stmt = $this->pdo->prepare(
+            'SELECT tg.idTag, tg.libelleTag, COUNT(abo.idUtil) AS nbAbonnes
+             FROM tag tg
+             LEFT JOIN abonnementtag abo ON abo.idTag = tg.idTag
+             GROUP BY tg.idTag, tg.libelleTag
+             ORDER BY nbAbonnes DESC, tg.libelleTag ASC
+             LIMIT :limite'
+        );
+        $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
+        $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 

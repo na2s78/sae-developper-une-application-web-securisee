@@ -54,7 +54,7 @@ abstract class Action
         );
     }
 
-    protected function extraitTexte(string $texte, int $max = 100): string
+    protected function extraitTexte(string $texte, int $max = 80): string
     {
         if (mb_strlen($texte) <= $max) {
             return $texte;

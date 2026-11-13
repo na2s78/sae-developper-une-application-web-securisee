@@ -37,7 +37,7 @@ document.getElementById('image')?.addEventListener('change', function () {
 <?php if ($tagRecherche !== null): ?>
     <section class="carte resultat-tag">
         <span>Tag recherché : <a class="tag" href="?action=tag&amp;tag=<?= rawurlencode($tagRecherche['libelleTag']) ?>">#<?= $this->e($tagRecherche['libelleTag']) ?></a></span>
-        <?php if (isset($_SESSION['idUtil'])): ?>
+        <?php if ((int) ($_SESSION['idUtil'] ?? 0) > 0): ?>
             <form method="post" action="?action=follow" class="suivre-form">
                 <input type="hidden" name="type" value="tag">
                 <input type="hidden" name="idTag" value="<?= (int) $tagRecherche['idTag'] ?>">
@@ -75,7 +75,7 @@ document.getElementById('image')?.addEventListener('change', function () {
         <?php $texteCourt = $this->extraitTexte((string) $touite['texteTouite']); ?>
         <article class="carte touite">
             <header class="touite-haut"><img <?= $this->logoAttribut((int) $touite['idUtil'], (int) $touite['roleUtil']) ?> src="ressources/images_css/touiteur_logo.svg" alt=""><div class="identite-auteur"><div class="nom-et-suivi"><a class="auteur" href="?action=user&amp;id=<?= (int) $touite['idUtil'] ?>"><?= $this->e($touite['prenomUtil'] . ' ' . $touite['nomUtil']) ?></a><?= $this->boutonSuivre((int) $touite['idUtil']) ?></div><time class="date" datetime="<?= $this->e($touite['datePub']) ?>"><?= $this->e($touite['datePub']) ?></time></div></header>
-            <p class="touite-texte"><?= $this->rendreTexte($texteCourt) ?></p>
+            <p class="touite-texte"><?= $this->rendreTexte($texteCourt) ?><?php if (!empty($touite['cheminImage'])): ?><img class="image-indicateur" src="ressources/images_css/img_logo.svg" alt="Image associée" title="Image associée"><?php endif; ?></p>
             <footer class="touite-bas"><span class="date">Publié par <?= $this->e($touite['prenomUtil'] . ' ' . $touite['nomUtil']) ?><?= $this->e($this->mentionAuteur((int) $touite['roleUtil'])) ?></span><?= $this->reactions((int) $touite['idTouite'], (int) $touite['nbEval']) ?><a class="lien-detail" href="?action=detail&amp;id=<?= (int) $touite['idTouite'] ?>">Voir le détail →</a></footer>
         </article>
     <?php endforeach; ?>

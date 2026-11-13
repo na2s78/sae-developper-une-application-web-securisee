@@ -15,9 +15,11 @@ class TagAction extends Action
         $valide = preg_match('/^[\p{L}\p{N}_]{1,30}$/u', $libelle) === 1;
         $touites = [];
         $similaires = [];
+        $tagRecherche = null;
         if ($valide) {
             $gestion = new GestionTouite($this->pdo);
             $touites = $gestion->getTouitesParLibelleTag($libelle);
+            $tagRecherche = $gestion->getTagByLibelle($libelle);
             if ($touites === []) {
                 $similaires = $gestion->getTagsSimilaires($libelle);
             }
@@ -27,6 +29,7 @@ class TagAction extends Action
             'message' => !$valide ? 'Un tag ne contient que des lettres, des chiffres et des _ (30 caractères maximum).' : null,
             'touites' => $touites,
             'similaires' => $similaires,
+            'tagRecherche' => $tagRecherche,
             'rechercheTag' => true,
         ]);
     }
