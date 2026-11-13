@@ -19,3 +19,4 @@ config.ini
 *.log
 uploads/*
 !uploads/.gitkeep
+web/ressources/images_upload/
