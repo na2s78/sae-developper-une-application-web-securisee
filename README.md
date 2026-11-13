@@ -134,3 +134,8 @@ Remarques :
     
 
     - Adnan (Adnan Hamed Omer) :
+
+        - création de la pages html au début
+        - création des premières versions des fonctionnalités 6,7,10,11
+        - correction des fichiers index.php, Action.php et dispatcher.php pour faire correctement fonctionner les fonctionnalités                     précédentes
+        - nouveaux codes pour ces fonctionnalités suite à la modification des fichiers index.php, dispatcher.php et Action.php
